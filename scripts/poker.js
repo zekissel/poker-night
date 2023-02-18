@@ -6,8 +6,8 @@ const numPlayers = 6;
 let bigBlind = 20;
 let curDealer = 0;
 let curMove = (curDealer + 3) % numPlayers;
-let state = 0;
 let minCall = 0;
+let newround = false;
 
 const players = [ { name: 'P1', money: 500, role: 'D', call: 0, fold: false },
                   { name: 'Alice', money: 500, role: 'SB', call: 0, fold: false },
@@ -71,6 +71,8 @@ function blind () {
 
     curPot += players[sb].call + players[bb].call;
     potGUI.innerText = `Current Pot - $${curPot}`;
+
+    minCall = bigBlind;
     
 }
 
@@ -83,11 +85,13 @@ function bettingRound (pass) {
             curMove = (curMove + 1) % numPlayers;
         }
 
+        newround = true;
+
         for (let p = 1; p < numPlayers; p++) {
             if (!players[p].fold && players[p].call < minCall) compRedemption(p);
         }
         if (!players[0].fold && players[0].call < minCall) playerRedemption();
-        gameManager(state);
+        else resetBets();
 
     } else {
 
@@ -102,6 +106,14 @@ function bettingRound (pass) {
         curMove++;
     }
 
+}
+
+function resetBets () {
+
+    for (let i = 0; i < numPlayers; i++) players[i].call = 0;
+    minCall = 0;
+    newround = false;
+    gameManager();
 }
 
 
@@ -146,7 +158,7 @@ confirm.addEventListener('click', (e) => {
 
     popUp.removeChild(confirm);
     document.body.removeChild(popUp);
-    gameManager(state);
+    gameManager();
 
 });
 
@@ -154,31 +166,40 @@ accept.addEventListener('click', (e) => {
 
 });
 
-function gameManager (gameState) {
+function gameManager () {
 
-    switch (gameState) {
+    switch (dealPhase) {
 
         case 0:
             shuffleDeck();
             dealPlayers();
             blind();
-            minCall = bigBlind;
-            state = 1;
             bettingRound();
             break;
         
         case 1:
+            console.log(`dealing flop`);
             dealFlop();
-            minCall = 0;
-            state = 2;
             bettingRound();
             break;
 
         case 2:
+            console.log(`dealing turn`);
+            dealTurn();
+            bettingRound();
+            break;
+
+        case 3:
+            console.log(`dealing river`);
+            dealRiver();
+            bettingRound();
+            
+            break;
+
+        case 4:
 
 
             break;
-
 
     }
 }
@@ -199,6 +220,7 @@ checkButton.addEventListener('click', (e) => {
 
         curPot += dif;
         potGUI.innerText = `Current Pot - $${curPot}`;
+        console.log(`I checked/called`);
         endPlayerMove();
     }
 });
@@ -240,8 +262,8 @@ function playerMove (ret) {
     raiseButton.disabled = false;
     foldButton.disabled = false;
 
-
-    alert('Your turn!');
+    const card_bg = document.getElementById('privateCards');
+    card_bg.style.backgroundColor = '#3775D3';
     
 
     console.log(playerHands);
@@ -253,9 +275,9 @@ function playerRedemption () {
 
     checkButton.disabled = false;
     foldButton.disabled = false;
-    alert('Call or fold');
 
-    
+    const card_bg = document.getElementById('privateCards');
+    card_bg.style.backgroundColor = '#3775D3';
 
 }
 
@@ -263,5 +285,9 @@ function endPlayerMove () {
     checkButton.disabled = true;
     raiseButton.disabled = true;
     foldButton.disabled = true;
-    bettingRound(true);
+    const card_bg = document.getElementById('privateCards');
+    card_bg.style.backgroundColor = '#7E8893';
+
+    if (newround) resetBets();
+    else bettingRound(true);
 }

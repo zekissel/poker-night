@@ -1,10 +1,17 @@
 
 function compMove (index) {
 
+    const card_bg = document.getElementsByClassName('names');
+    card_bg[index - 1].style.backgroundColor = '#3775D3';
+
     let bet = analyzeHand(index);
+
+
     if (bet > 5) compRaise(index, bet - 5);
     else if (bet > 2) compCall(index);
     else compFold(index);
+
+    card_bg[index - 1].style.backgroundColor = '#252627';
 }
 
 function compRedemption (index) {
@@ -49,58 +56,60 @@ function analyzeHand (index) {
 
 }
 
-function compCall (index) {
-
-    let dif = minCall - players[index].call;
-    if (dif > 0) {
-        let moneyGUI = playersGUI[index].getElementsByClassName('moneyCount');
-
-        if (dif <= players[index].money) {
-            /* update comp money and GUI */
-            players[index].money -= dif;
-            players[index].call += dif;
-            
-            moneyGUI[0].innerText = `$${players[index].money}`;
-
-            /* update pot and game states */
-            curPot += dif;
-            
-
-        } else {
-            players[index].call += players[index].money;
-            curPot += players[index].money;
-            players[index].money = 0;
-            
-            moneyGUI[0].innerText = `$${players[index].money}`;
-
-        }
-        potGUI.innerText = `Current Pot - $${curPot}`;
-    } else compFold(index);
-}
-
 function compRaise (index, value) {
     let bet = (value * 10) + (minCall - players[index].call);
 
     if (players[index].money >= bet) {
-        let moneyGUI = playersGUI[index].getElementsByClassName('moneyCount');
 
         players[index].money -= bet;
         players[index].call += bet;
         
+        let moneyGUI = playersGUI[index].getElementsByClassName('moneyCount');
         moneyGUI[0].innerText = `$${players[index].money}`;
 
         /* update pot and game states */
         curPot += bet;
         potGUI.innerText = `Current Pot - $${curPot}`;
-        minCall += value * 10;
+        minCall += (value * 10);
+
+        console.log(`player ${index} raise by ${bet}`);
 
     } else {
         compCall(index);
     }
 }
 
+function compCall (index) {
+
+    let bet = minCall - players[index].call;
+
+    if (players[index].money >= bet) {
+
+        /* update comp money and GUI */
+        players[index].money -= bet;
+        players[index].call += bet;
+
+    } else {
+
+        bet = players[index].money;
+        players[index].money -= bet;
+        players[index].call += bet;
+
+    }
+
+    let moneyGUI = playersGUI[index].getElementsByClassName('moneyCount');
+    moneyGUI[0].innerText = `$${players[index].money}`;
+
+    /* update pot and game states */
+    curPot += bet;
+    potGUI.innerText = `Current Pot - $${curPot}`;
+
+    console.log(`player ${index} call`);
+}
+
 function compFold (index) {
     players[index].fold = true;
+    console.log(`player ${index} fold`);
 }
 
 /* map string to rank value */
