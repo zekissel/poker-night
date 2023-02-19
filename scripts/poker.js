@@ -9,7 +9,7 @@ let curMove = (curDealer + 3) % numPlayers;
 let minCall = 0;
 let newround = false;
 
-const sleep_timer = 1500;
+const sleep_timer = 500;
 
 const players = [ { name: 'P1', money: 500, role: 'D', call: 0, fold: false },
                   { name: 'Alice', money: 500, role: 'SB', call: 0, fold: false },
@@ -103,9 +103,9 @@ async function bettingRound (pass) {
             }
             curMove = (curMove + 1) % numPlayers;
         }
-
-        if (!players[0].fold) playerMove();
         curMove++;
+        if (!players[0].fold) playerMove();
+        else bettingRound(true);
     }
 
 }
@@ -230,8 +230,17 @@ function gameManager () {
             break;
 
         case 4:
+            /* card reveal and round decider function (add pot to winners money, update GUI) */
 
-
+            dealPhase = 5;
+            gameManager();
+            break;
+        case 5:
+            console.log('deal reset');
+            for (let n = 0; n < 5; n++) card_bg[n].style.backgroundColor = '#252627';
+            resetDeal();
+            rotateButton();
+            gameManager();
             break;
 
     }
@@ -281,6 +290,7 @@ const foldButton = document.getElementById('fold');
 foldButton.disabled = true;
 foldButton.addEventListener('click', (e) => {
     console.log('test fold');
+    players[0].fold = true;
     endPlayerMove();
 });
 

@@ -5,7 +5,7 @@ for (let c = 0; c < 52; c++) {
     cardDeck[c] = getRank(c) + getSuit(c);
 }
 
-/* Phase 0: deal players, 1: deal flop, 2: deal turn, 3: deal river, 4: reset */
+/* Phase 0: deal players, 1: deal flop, 2: deal turn, 3: deal river, 4: showdown, 5: reset */
 let dealPhase = 0;
 
 const playerHands = [ {c1: '', c2: ''},
@@ -69,10 +69,15 @@ function dealPlayers () {
 function resetDeal () {
     for (let n = 0; n < numPlayers; n++) {
         playerHands[n].c1 = '';
+        players[n].fold = false;
     }
     for (let n = 0; n < numPlayers; n++) {
         playerHands[n].c2 = '';
     }
+    communityCards.f1 = ''; communityCards.f2 = ''; communityCards.f3 = '';
+    communityCards.t = ''; communityCards.r = '';
+    flop1.innerText = ''; flop2.innerText = ''; flop3.innerText = '';
+    turn.innerText = ''; river.innerText = ''; 
     hand1.innerText = '';
     hand2.innerText = '';
     dealPhase = 0;
