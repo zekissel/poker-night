@@ -83,6 +83,36 @@ function resetDeal () {
     dealPhase = 0;
 }
 
+
+
+
+function showdown () {
+
+    let finalists = [];
+
+    for (let p = 0; p < numPlayers; p++) {
+        if (!players[p].fold) {
+            let p_hand = new Object();
+            p_hand.c1 = playerHands[p].c1;
+            p_hand.c2 = playerHands[p].c2;
+            p_hand.c3 = communityCards.f1;
+            p_hand.c4 = communityCards.f2;
+            p_hand.c5 = communityCards.f3;
+            p_hand.c6 = communityCards.t;
+            p_hand.c7 = communityCards.r;
+            finalists.push(p_hand);
+        }
+    }
+
+    for (let f of finalists) {
+        
+        for (let c in f) {
+            console.log(f[c]);
+        }
+    }
+
+}
+
 /* randomize card order and reset draw count*/
 function shuffleDeck () {
     for (let n = 0; n < 3; n++) {

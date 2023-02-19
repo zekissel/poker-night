@@ -15,9 +15,13 @@ function compMove (index) {
 }
 
 function compRedemption (index) {
+    
     let bet = analyzeHand(index);
     if (bet > 3) compCall(index);
     else compFold(index);
+
+    if (!players[index].fold) card_bg[index - 1].style.backgroundColor = '#252627';
+    else card_bg[index - 1].style.backgroundColor = '#A20021';
 }
 
 
@@ -72,7 +76,7 @@ function compRaise (index, value) {
         potGUI.innerText = `Current Pot - $${curPot}`;
         minCall += (value * 10);
 
-        console.log(`player ${index} raise by ${bet}`);
+        console.log(`player ${index} raise by ${value * 10}`);
 
     } else {
         compCall(index);

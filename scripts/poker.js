@@ -231,7 +231,7 @@ function gameManager () {
 
         case 4:
             /* card reveal and round decider function (add pot to winners money, update GUI) */
-
+            showdown();
             dealPhase = 5;
             gameManager();
             break;
@@ -267,23 +267,35 @@ checkButton.addEventListener('click', (e) => {
     }
 });
 
+let raiseValue = 0;
 const raiseButton = document.getElementById('raise');
 raiseButton.disabled = true;
 raiseButton.addEventListener('click', (e) => {
-    console.log('test raise');
-    endPlayerMove();
+    raiseValue += minCall;
+    if (players[0].money >= raiseValue) {
+        players[0].call += raiseValue;
+        players[0].money -= raiseValue;
+
+        let moneyGUI = playersGUI[0].getElementsByClassName('moneyCount');
+        moneyGUI[0].innerText = `$${players[0].money}`;
+
+        curPot += raiseValue;
+        minCall = raiseValue;
+        potGUI.innerText = `Current Pot - $${curPot}`;
+        console.log('i raised');
+        endPlayerMove();
+    }
 });
 
 const betSlider = document.getElementById('slider');
 betSlider.addEventListener('click', (e) => {
 
     let myMoney = players[0].money;
-    let bet = myMoney * (e.target.value / 100);
+    let bet = Math.floor(myMoney * (e.target.value / 100));
+    raiseValue = bet;
 
-    if (bet == myMoney) {
-        raiseButton.value = `All In - $${bet}`;
-
-    } else raiseButton.value = `Raise - $${bet}`;
+    if (bet == myMoney) raiseButton.value = `All In - $${bet}`;
+    else raiseButton.value = `Raise - $${bet}`;
 });
 
 const foldButton = document.getElementById('fold');
