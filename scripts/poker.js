@@ -9,6 +9,8 @@ let curMove = (curDealer + 3) % numPlayers;
 let minCall = 0;
 let newround = false;
 
+const sleep_timer = 1500;
+
 const players = [ { name: 'P1', money: 500, role: 'D', call: 0, fold: false },
                   { name: 'Alice', money: 500, role: 'SB', call: 0, fold: false },
                   { name: 'Bill', money: 500, role: 'BB', call: 0, fold: false }, 
@@ -76,36 +78,68 @@ function blind () {
     
 }
 
-function bettingRound (pass) {
+async function bettingRound (pass) {
 
     if (pass) {
 
         while (curMove != (curDealer + 3) % numPlayers) {
-            compMove(curMove);
+            if (!players[curMove].fold) {
+                card_bg[curMove - 1].style.backgroundColor = '#3775D3';
+                await sleep(sleep_timer);
+                compMove(curMove);
+            }
             curMove = (curMove + 1) % numPlayers;
         }
 
-        newround = true;
-
-        for (let p = 1; p < numPlayers; p++) {
-            if (!players[p].fold && players[p].call < minCall) compRedemption(p);
-        }
-        if (!players[0].fold && players[0].call < minCall) playerRedemption();
-        else resetBets();
+        secondBet();
 
     } else {
 
         while (curMove != 0) {
-
-            compMove(curMove);
+            if (!players[curMove].fold) {
+                card_bg[curMove - 1].style.backgroundColor = '#3775D3';
+                await sleep(sleep_timer);
+                compMove(curMove);
+            }
             curMove = (curMove + 1) % numPlayers;
-
         }
 
-        playerMove();
+        if (!players[0].fold) playerMove();
         curMove++;
     }
 
+}
+
+async function secondBet (pass) {
+
+    newround = true;
+    if (pass) {
+        newround = false;
+
+        while (curMove != (curDealer + 3) % numPlayers) {
+            if (!players[curMove].fold && players[curMove].call < minCall) {
+                card_bg[curMove - 1].style.backgroundColor = '#3775D3';
+                await sleep(sleep_timer);
+                compRedemption(curMove);
+            }
+            curMove = (curMove + 1) % numPlayers;
+        }
+
+        resetBets();
+
+    } else {
+        while (curMove != 0) {
+            if (!players[curMove].fold && players[curMove].call < minCall) {
+                card_bg[curMove - 1].style.backgroundColor = '#3775D3';
+                await sleep(sleep_timer);
+                compRedemption(curMove);
+            }
+            curMove = (curMove + 1) % numPlayers;
+        }
+        curMove++;
+        if (!players[0].fold && players[0].call < minCall) playerRedemption();
+        else secondBet(true);
+    }
 }
 
 function resetBets () {
@@ -193,7 +227,6 @@ function gameManager () {
             console.log(`dealing river`);
             dealRiver();
             bettingRound();
-            
             break;
 
         case 4:
@@ -288,6 +321,6 @@ function endPlayerMove () {
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#7E8893';
 
-    if (newround) resetBets();
+    if (newround) secondBet(true);
     else bettingRound(true);
 }

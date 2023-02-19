@@ -1,17 +1,17 @@
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const card_bg = document.getElementsByClassName('names');
 
 function compMove (index) {
 
-    const card_bg = document.getElementsByClassName('names');
-    card_bg[index - 1].style.backgroundColor = '#3775D3';
-
     let bet = analyzeHand(index);
-
 
     if (bet > 5) compRaise(index, bet - 5);
     else if (bet > 2) compCall(index);
     else compFold(index);
 
-    card_bg[index - 1].style.backgroundColor = '#252627';
+    if (!players[index].fold) card_bg[index - 1].style.backgroundColor = '#252627';
+    else card_bg[index - 1].style.backgroundColor = '#A20021';
 }
 
 function compRedemption (index) {
