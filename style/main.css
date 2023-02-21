@@ -86,7 +86,7 @@ h1 {
 #mydash {
     float: right;
     position: relative;
-    bottom: 55px;
+    bottom: 100px;
     margin: 1%;
     background-color: var(--fg2);
     padding: 3%;
@@ -155,7 +155,6 @@ h1 {
     font-size: 125%;
     background-color: var(--fg2);
     position:relative;
-    top: 10px;
 }
 
 .blind {
@@ -169,5 +168,10 @@ h1 {
 #history {
     width: 400%;
     overflow: scroll;
-    height: 30vh;
+    height: 28vh;
+}
+
+#history li {
+    font-size: 130%;
+    padding: 1%;
 }

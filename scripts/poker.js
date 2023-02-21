@@ -305,6 +305,7 @@ function gameManager () {
 
 function updateWinner (windex) {
 
+    let msg = `Pot of $${curPot} goes to ${players[windex].name}!`;
     players[windex].money += curPot;
     let moneyGUI = playersGUI[windex].getElementsByClassName('moneyCount');
     moneyGUI[0].innerText = `$${players[windex].money}`;
@@ -313,7 +314,7 @@ function updateWinner (windex) {
     potGUI.innerText = `Current Pot: $${curPot}`;
 
     dealPhase = 5;
-    prompt.nodeValue = `The winner of this round is ${players[windex].name}!`;
+    prompt.nodeValue = msg;
     popUp.appendChild(accept);
     document.body.appendChild(popUp);
 }
