@@ -1,6 +1,7 @@
 
 let curPot = 0;
 const potGUI = document.getElementById('pot');
+const callGUI = document.getElementById('call');
 
 const numPlayers = 6;
 let bigBlind = 20;
@@ -81,9 +82,10 @@ function blind () {
     bbMoney[0].innerText = `$${players[bb].money}`;
 
     curPot += players[sb].call + players[bb].call;
-    potGUI.innerText = `Current Pot - $${curPot}`;
+    potGUI.innerText = `Current Pot: $${curPot}`;
 
     minCall = bigBlind;
+    callGUI.innerText = `Current minimum call: $${minCall}`;
     
 }
 
@@ -155,6 +157,7 @@ function resetBets () {
 
     for (let i = 0; i < numPlayers; i++) players[i].call = 0;
     minCall = 0;
+    callGUI.innerText = `Current minimum call: $${minCall}`;
     newround = false;
     gameManager();
 }
@@ -280,7 +283,7 @@ function updateWinner (windex) {
     moneyGUI[0].innerText = `$${players[windex].money}`;
 
     curPot = 0;
-    potGUI.innerText = `Current Pot - $${curPot}`;
+    potGUI.innerText = `Current Pot: $${curPot}`;
 
     dealPhase = 5;
     prompt.nodeValue = `The winner of this round is ${players[windex].name}!`;
@@ -305,7 +308,7 @@ checkButton.addEventListener('click', (e) => {
         moneyGUI[0].innerText = `$${players[0].money}`;
 
         curPot += dif;
-        potGUI.innerText = `Current Pot - $${curPot}`;
+        potGUI.innerText = `Current Pot: $${curPot}`;
         console.log(`I checked/called`);
         endPlayerMove();
     }
@@ -325,7 +328,8 @@ raiseButton.addEventListener('click', (e) => {
 
         curPot += raiseValue;
         minCall = raiseValue;
-        potGUI.innerText = `Current Pot - $${curPot}`;
+        potGUI.innerText = `Current Pot: $${curPot}`;
+        callGUI.innerText = `Current minimum call: $${minCall}`;
         console.log('i raised');
 
         betSlider.value = 0;

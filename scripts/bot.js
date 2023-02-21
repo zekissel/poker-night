@@ -74,8 +74,9 @@ function compRaise (index, value) {
 
         /* update pot and game states */
         curPot += bet;
-        potGUI.innerText = `Current Pot - $${curPot}`;
+        potGUI.innerText = `Current Pot: $${curPot}`;
         minCall += (value * 10);
+        callGUI.innerText = `Current minimum call: $${minCall}`;
 
         console.log(`player ${index} raise by ${value * 10}`);
 
@@ -109,7 +110,7 @@ function compCall (index) {
 
     /* update pot and game states */
     curPot += bet;
-    potGUI.innerText = `Current Pot - $${curPot}`;
+    potGUI.innerText = `Current Pot: $${curPot}`;
 
     console.log(`player ${index} call`);
 }
