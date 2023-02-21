@@ -78,7 +78,7 @@ function compRaise (index, value) {
         minCall += (value * 10);
         callGUI.innerText = `Current minimum call: $${minCall}`;
 
-        console.log(`player ${index} raise by ${value * 10}`);
+        updateHistory(index, value * 10);
 
     } else {
         compCall(index);
@@ -112,7 +112,7 @@ function compCall (index) {
     curPot += bet;
     potGUI.innerText = `Current Pot: $${curPot}`;
 
-    console.log(`player ${index} call`);
+    updateHistory(index, 0);
 }
 
 function compFold (index) {
@@ -121,7 +121,7 @@ function compFold (index) {
 
     if (testFold() !== index) {
         players[index].fold = true;
-        console.log(`player ${index} fold`);
+        updateHistory(index);
     }
 }
 

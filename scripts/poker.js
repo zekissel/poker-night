@@ -2,6 +2,8 @@
 let curPot = 0;
 const potGUI = document.getElementById('pot');
 const callGUI = document.getElementById('call');
+const historyGUI = document.getElementById('history');
+let alt = false;
 
 const numPlayers = 6;
 let bigBlind = 20;
@@ -23,6 +25,31 @@ const rawPlayersGUI = document.getElementsByClassName('players');
 const playersGUI = Array.from(rawPlayersGUI);
 const myGUI = document.getElementById('mydash');
 playersGUI.unshift(myGUI);
+
+
+function updateHistory (index, value, msg) {
+
+    let newitem = document.createElement("li");
+    if (alt) newitem.style.backgroundColor = '#596069';
+    alt = !alt;
+
+    if (msg != undefined) {
+        newitem.appendChild(document.createTextNode(msg));
+        historyGUI.prepend(newitem);
+        return;
+    }
+    
+    if (!isNaN(value)) {
+        if (value > 0) {
+            newitem.appendChild(document.createTextNode(`${players[index].name} raised by $${value}.`));
+        } else [
+            newitem.appendChild(document.createTextNode(`${players[index].name} called ($${minCall}).`))
+        ]
+    } else {
+        newitem.appendChild(document.createTextNode(`${players[index].name} folded.`));
+    }
+    historyGUI.prepend(newitem);
+}
 
 /* rotates Dealer, Small Blind, and Big Blind buttons when a hand is finished */
 function rotateButton () {
@@ -94,7 +121,7 @@ async function bettingRound (pass) {
     if (pass) {
 
         while (curMove != (curDealer + 3) % numPlayers) {
-            if (!players[curMove].fold) {
+            if (!players[curMove].fold && curMove != 0) {
                 card_bg[curMove - 1].style.backgroundColor = '#3775D3';
                 await sleep(sleep_timer);
                 compMove(curMove);
@@ -107,7 +134,7 @@ async function bettingRound (pass) {
     } else {
 
         while (curMove != 0) {
-            if (!players[curMove].fold) {
+            if (!players[curMove].fold && curMove != 0) {
                 card_bg[curMove - 1].style.backgroundColor = '#3775D3';
                 await sleep(sleep_timer);
                 compMove(curMove);
@@ -128,7 +155,7 @@ async function secondBet (pass) {
         newround = false;
 
         while (curMove != (curDealer + 3) % numPlayers) {
-            if (!players[curMove].fold && players[curMove].call < minCall) {
+            if (!players[curMove].fold && players[curMove].call < minCall && curMove != 0) {
                 card_bg[curMove - 1].style.backgroundColor = '#3775D3';
                 await sleep(sleep_timer);
                 compRedemption(curMove);
@@ -140,7 +167,7 @@ async function secondBet (pass) {
 
     } else {
         while (curMove != 0) {
-            if (!players[curMove].fold && players[curMove].call < minCall) {
+            if (!players[curMove].fold && players[curMove].call < minCall && curMove != 0) {
                 card_bg[curMove - 1].style.backgroundColor = '#3775D3';
                 await sleep(sleep_timer);
                 compRedemption(curMove);
@@ -222,6 +249,7 @@ function gameManager () {
 
         case 0:
             shuffleDeck();
+            updateHistory(0,0,'Dealing players.');
             dealPlayers();
             blind();
             bettingRound();
@@ -229,14 +257,14 @@ function gameManager () {
         
         case 1:
             if (testFold() === false) {
-                console.log(`dealing flop`);
+                updateHistory(0,0,'Dealing flop.');
                 dealFlop();
                 bettingRound();
             } else updateWinner(testFold());
             break;
         case 2:
             if (testFold() === false) {
-                console.log(`dealing turn`);
+                updateHistory(0,0,'Dealing turn.');
                 dealTurn();
                 bettingRound();
             } else updateWinner(testFold());
@@ -244,7 +272,7 @@ function gameManager () {
 
         case 3:
             if (testFold() === false) {
-                console.log(`dealing river`);
+                updateHistory(0,0,'Dealing river.');
                 dealRiver();
                 bettingRound();
             } else updateWinner(testFold());
@@ -259,7 +287,6 @@ function gameManager () {
             break;
 
         case 5:
-            console.log('deal reset');
 
             resetDeal();
             rotateButton();
@@ -309,7 +336,7 @@ checkButton.addEventListener('click', (e) => {
 
         curPot += dif;
         potGUI.innerText = `Current Pot: $${curPot}`;
-        console.log(`I checked/called`);
+        updateHistory(0, 0);
         endPlayerMove();
     }
 });
@@ -330,7 +357,7 @@ raiseButton.addEventListener('click', (e) => {
         minCall = raiseValue;
         potGUI.innerText = `Current Pot: $${curPot}`;
         callGUI.innerText = `Current minimum call: $${minCall}`;
-        console.log('i raised');
+        updateHistory(0, raiseValue);
 
         betSlider.value = 0;
         raiseValue = 0;
@@ -353,14 +380,13 @@ betSlider.addEventListener('click', (e) => {
 const foldButton = document.getElementById('fold');
 foldButton.disabled = true;
 foldButton.addEventListener('click', (e) => {
-    console.log('test fold');
+    updateHistory(0);
     players[0].fold = true;
     endPlayerMove();
 });
 
 const skipButton = document.getElementById('skip');
 skipButton.addEventListener('click', (e) => {
-    console.log('test skip');
     if (sleep_timer > 0) {
         sleep_timer = 0;
         skipButton.style.backgroundColor = '#596069';
@@ -377,6 +403,9 @@ function playerMove (ret) {
     raiseButton.disabled = false;
     foldButton.disabled = false;
 
+    if (minCall > 0) checkButton.value = `Call: $${minCall}`;
+    else checkButton.value = `Check`;
+
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#3775D3';
     
@@ -384,15 +413,15 @@ function playerMove (ret) {
         endPlayerMove();
     }
 
-    console.log(playerHands);
-    console.log(players);
-
 }
 
 function playerRedemption () {
 
     checkButton.disabled = false;
     foldButton.disabled = false;
+
+    if (minCall > 0) checkButton.value = `Call: $${minCall}`;
+    else checkButton.value = `Check`;
 
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#3775D3';
@@ -409,6 +438,8 @@ function endPlayerMove () {
     foldButton.disabled = true;
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#7E8893';
+
+    checkButton.value = `Check`;
 
     if (newround) secondBet(true);
     else bettingRound(true);

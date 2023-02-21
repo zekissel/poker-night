@@ -84,6 +84,7 @@ function resetDeal () {
     hand1.innerText = '';
     hand2.innerText = '';
     dealPhase = 0;
+    historyGUI.innerText = '';
 }
 
 /* if all but one have folded, that player wins */
@@ -113,27 +114,27 @@ function showdown () {
             p_hand.c6 = communityCards.t;
             p_hand.c7 = communityCards.r;
             finalists.push(p_hand);
+            console.log(`${players[p].name}`);
+            console.log(p_hand);
         }
     }
 
     let scores = [];
 
-    for (let f of finalists) {
-
+    for (let fin = 0; fin < finalists.length; fin++) {
+        let f = finalists[fin];
         let score = scoreHand(f);
         scores.push(score);
-        
-        
     }
     
     let winner = 10;
     let tie_break = false;
-    for (let s of scores) {
-        if (s < winner) {
-            winner = s;
+    for (let s = 0; s < scores.length; s++) {
+        if (scores[s] < winner) {
+            winner = scores[s];
             tie_break = false;
         }
-        else if (s == winner) tie_break = true;
+        else if (scores[s] == winner) tie_break = true;
     }
     if (tie_break) {
         // implement tiebreak
@@ -143,7 +144,7 @@ function showdown () {
     while (scores[windex] != winner) {
         windex++;
     }
-    
+    console.log(`winning index = ${windex}`);
     console.log(finalists);
     console.log(scores);
 
@@ -152,6 +153,7 @@ function showdown () {
         if (!players[i].fold) {
             if (notfolded == windex) {
                 windex = i;
+                break;
             }
             notfolded++;
         }

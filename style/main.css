@@ -165,3 +165,9 @@ h1 {
     float: right;
     min-height: 30px;
 }
+
+#history {
+    width: 400%;
+    overflow: scroll;
+    height: 30vh;
+}
