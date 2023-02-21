@@ -360,9 +360,6 @@ raiseButton.addEventListener('click', (e) => {
         callGUI.innerText = `Current minimum call: $${minCall}`;
         updateHistory(0, raiseValue);
 
-        betSlider.value = 0;
-        raiseValue = 0;
-        raiseButton.value = `Raise - $0`;
         endPlayerMove();
     }
 });
@@ -441,6 +438,10 @@ function endPlayerMove () {
     card_bg.style.backgroundColor = '#7E8893';
 
     checkButton.value = `Check`;
+
+    betSlider.value = 0;
+    raiseValue = 0;
+    raiseButton.value = `Raise - $0`;
 
     if (newround) secondBet(true);
     else bettingRound(true);

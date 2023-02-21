@@ -155,6 +155,7 @@ h1 {
     font-size: 125%;
     background-color: var(--fg2);
     position:relative;
+    top: 15px;
 }
 
 .blind {

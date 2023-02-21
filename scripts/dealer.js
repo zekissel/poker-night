@@ -114,8 +114,7 @@ function showdown () {
             p_hand.c6 = communityCards.t;
             p_hand.c7 = communityCards.r;
             finalists.push(p_hand);
-            console.log(`${players[p].name}`);
-            console.log(p_hand);
+            updateHistory(0,0,`${players[p].name}'s hand: ${p_hand.c1} + ${p_hand.c2}`);
         }
     }
 
@@ -126,6 +125,9 @@ function showdown () {
         let score = scoreHand(f);
         scores.push(score);
     }
+
+    console.log(finalists);
+    console.log(scores);
     
     let winner = 10;
     let tie_break = false;
@@ -144,9 +146,6 @@ function showdown () {
     while (scores[windex] != winner) {
         windex++;
     }
-    console.log(`winning index = ${windex}`);
-    console.log(finalists);
-    console.log(scores);
 
     let notfolded = 0;
     for (let i = 0; i < numPlayers; i++) {
