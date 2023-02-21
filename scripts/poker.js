@@ -197,7 +197,9 @@ confirm.addEventListener('click', (e) => {
 });
 
 accept.addEventListener('click', (e) => {
-
+    popUp.removeChild(accept);
+    document.body.removeChild(popUp);
+    gameManager();
 });
 
 function gameManager () {
@@ -231,16 +233,21 @@ function gameManager () {
 
         case 4:
             /* card reveal and round decider function (add pot to winners money, update GUI) */
-            showdown();
-            dealPhase = 5;
-            gameManager();
+            let winner = showdown();
+            
+            prompt.nodeValue = `The winner of this round is ${players[winner].name}!`;
+            popUp.appendChild(accept);
+            document.body.appendChild(popUp);
             break;
         case 5:
             console.log('deal reset');
             for (let n = 0; n < 5; n++) card_bg[n].style.backgroundColor = '#252627';
             resetDeal();
             rotateButton();
-            gameManager();
+            
+            prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
+            popUp.appendChild(confirm);
+            document.body.appendChild(popUp);
             break;
 
     }
