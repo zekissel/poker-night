@@ -9,12 +9,14 @@ let curMove = (curDealer + 3) % numPlayers;
 let minCall = 0;
 let newround = false;
 
-const players = [ { name: 'P1', money: 500, role: 'D', call: 0, fold: false },
-                  { name: 'Alice', money: 500, role: 'SB', call: 0, fold: false },
-                  { name: 'Bill', money: 500, role: 'BB', call: 0, fold: false }, 
-                  { name: 'Chauncy', money: 500, role: '', call: 0, fold: false },
-                  { name: 'Denise', money: 500, role: '', call: 0, fold: false },
-                  { name: 'Etho', money: 500, role: '', call: 0, fold: false } ];
+const startMoney = 1000;
+
+const players = [ { name: 'P1', money: startMoney, role: 'D', call: 0, fold: false },
+                  { name: 'Alice', money: startMoney, role: 'SB', call: 0, fold: false },
+                  { name: 'Bill', money: startMoney, role: 'BB', call: 0, fold: false }, 
+                  { name: 'Chauncy', money: startMoney, role: '', call: 0, fold: false },
+                  { name: 'Denise', money: startMoney, role: '', call: 0, fold: false },
+                  { name: 'Etho', money: startMoney, role: '', call: 0, fold: false } ];
 
 const rawPlayersGUI = document.getElementsByClassName('players');
 const playersGUI = Array.from(rawPlayersGUI);
@@ -23,29 +25,38 @@ playersGUI.unshift(myGUI);
 
 /* rotates Dealer, Small Blind, and Big Blind buttons when a hand is finished */
 function rotateButton () {
-    let temp = players[0].role;
-    let temp2;
-    /* cycle button positions */
-    for (let b = 1; b < numPlayers + 1; b++) {
-        temp2 = players[b % numPlayers].role;
-        players[b % numPlayers].role = temp;
-        temp = temp2;
+
+    let dealer = (curDealer + 1) % numPlayers;
+    while (players[dealer].fold) dealer = (dealer + 1) % numPlayers;
+
+    for (let p of players) {
+        p.role = '';
     }
 
+    players[dealer].role = 'D';
+    curDealer = dealer;
+    curMove = (dealer + 3) % numPlayers;
+    while (players[curMove].fold) curMove = (curMove + 1) % numPlayers;
+
+    let sb = (dealer + 1) % numPlayers;
+    while (players[sb].fold) sb = (sb + 1) % numPlayers;
+    players[sb].role = 'SB';
+
+    let bb = (sb + 1) % numPlayers;
+    while (players[bb].fold) bb = (bb + 1) % numPlayers;
+    players[bb].role = 'BB';
+
     /* update GUI */
-    for (let i = 0; i < 4; i++) {
-        index = (curDealer + i) % numPlayers;
+    for (let index = 0; index < numPlayers; index++) {
         let blind = playersGUI[index].getElementsByClassName('blind');
         blind[0].innerText = players[index].role;
     }
-    /* cycle index of dealer button */
-    curDealer = (curDealer + 1) % numPlayers;
-    curMove = (curDealer + 3) % numPlayers;
 }
 
 function blind () {
-    let sb = (curDealer + 1) % numPlayers;
-    let bb = (curDealer + 2) % numPlayers;
+    let sb = 0; let bb = 0;
+    while (players[sb].role != 'SB') sb = (sb + 1) % numPlayers;
+    while (players[bb].role != 'BB') bb = (bb + 1) % numPlayers;
 
     if (players[sb].money > bigBlind / 2) {
         players[sb].call = bigBlind / 2;
@@ -214,37 +225,45 @@ function gameManager () {
             break;
         
         case 1:
-            console.log(`dealing flop`);
-            dealFlop();
-            bettingRound();
+            if (testFold() === false) {
+                console.log(`dealing flop`);
+                dealFlop();
+                bettingRound();
+            } else updateWinner(testFold());
             break;
-
         case 2:
-            console.log(`dealing turn`);
-            dealTurn();
-            bettingRound();
+            if (testFold() === false) {
+                console.log(`dealing turn`);
+                dealTurn();
+                bettingRound();
+            } else updateWinner(testFold());
             break;
 
         case 3:
-            console.log(`dealing river`);
-            dealRiver();
-            bettingRound();
+            if (testFold() === false) {
+                console.log(`dealing river`);
+                dealRiver();
+                bettingRound();
+            } else updateWinner(testFold());
             break;
 
         case 4:
-            /* card reveal and round decider function (add pot to winners money, update GUI) */
-            let winner = showdown();
-            
-            prompt.nodeValue = `The winner of this round is ${players[winner].name}!`;
-            popUp.appendChild(accept);
-            document.body.appendChild(popUp);
+            if (testFold() === false) {
+            /* card reveal and round decider function */
+                let winner = showdown();
+                updateWinner(winner);
+            } else updateWinner(testFold());
             break;
+
         case 5:
             console.log('deal reset');
 
             resetDeal();
             rotateButton();
-            for (let n = 0; n < 5; n++) if (!players[n+1].fold)card_bg[n].style.backgroundColor = '#252627';
+            for (let n = 0; n < 5; n++) {
+                if (!players[n+1].fold) card_bg[n].style.backgroundColor = '#252627';
+                else card_bg[n].style.backgroundColor = '#A20021';
+            }
             
             prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
             popUp.appendChild(confirm);
@@ -254,11 +273,28 @@ function gameManager () {
     }
 }
 
+function updateWinner (windex) {
+
+    players[windex].money += curPot;
+    let moneyGUI = playersGUI[windex].getElementsByClassName('moneyCount');
+    moneyGUI[0].innerText = `$${players[windex].money}`;
+
+    curPot = 0;
+    potGUI.innerText = `Current Pot - $${curPot}`;
+
+    dealPhase = 5;
+    prompt.nodeValue = `The winner of this round is ${players[windex].name}!`;
+    popUp.appendChild(accept);
+    document.body.appendChild(popUp);
+}
+
 
 /* MOVE BUTTONS */
 const checkButton = document.getElementById('check');
 checkButton.disabled = true;
 checkButton.addEventListener('click', (e) => {
+
+    if (players[0].money == 0) endPlayerMove();
 
     let dif = minCall - players[0].call;
     if (players[0].money >= dif) {
@@ -340,6 +376,9 @@ function playerMove (ret) {
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#3775D3';
     
+    if (testFold() === 0) {
+        endPlayerMove();
+    }
 
     console.log(playerHands);
     console.log(players);
@@ -353,6 +392,10 @@ function playerRedemption () {
 
     const card_bg = document.getElementById('privateCards');
     card_bg.style.backgroundColor = '#3775D3';
+
+    if (testFold() === 0) {
+        endPlayerMove();
+    }
 
 }
 

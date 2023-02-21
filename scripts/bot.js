@@ -86,6 +86,8 @@ function compRaise (index, value) {
 
 function compCall (index) {
 
+    if (players[index].money == 0) return;
+
     let bet = minCall - players[index].call;
 
     if (players[index].money >= bet) {
@@ -113,8 +115,13 @@ function compCall (index) {
 }
 
 function compFold (index) {
-    players[index].fold = true;
-    console.log(`player ${index} fold`);
+
+    if (players[index].money == 0) return;
+
+    if (testFold() !== index) {
+        players[index].fold = true;
+        console.log(`player ${index} fold`);
+    }
 }
 
 /* map string to rank value */

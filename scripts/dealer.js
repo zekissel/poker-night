@@ -53,10 +53,12 @@ function dealRiver () {
 /* deal all players two cards in a cyclic fashion, starting from left of dealer */
 function dealPlayers () {
     for (let n = 1; n <= numPlayers; n++) {
-        playerHands[(n + curDealer) % numPlayers].c1 = cardDeck[curCard++];
+        let ind = (n + curDealer) % numPlayers;
+        if (!players[ind].fold) playerHands[ind].c1 = cardDeck[curCard++];
     }
     for (let n = 1; n <= numPlayers; n++) {
-        playerHands[(n + curDealer) % numPlayers].c2 = cardDeck[curCard++];
+        let ind = (n + curDealer) % numPlayers;
+        if (!players[ind].fold) playerHands[ind].c2 = cardDeck[curCard++];
     }
 
     /* update GUI */
@@ -84,8 +86,17 @@ function resetDeal () {
     dealPhase = 0;
 }
 
-
-
+/* if all but one have folded, that player wins */
+function testFold () {
+    let last;
+    let left = 6;
+    for (let i = 0; i < numPlayers; i++) {
+        if (!players[i].fold) last = i;
+        else left--;
+    }
+    if (left == 1) return last;
+    else return false;
+}
 
 function showdown () {
 
@@ -139,23 +150,14 @@ function showdown () {
     let notfolded = 0;
     for (let i = 0; i < numPlayers; i++) {
         if (!players[i].fold) {
-            notfolded++;
-            if (notfolded - 1 == windex) {
+            if (notfolded == windex) {
                 windex = i;
             }
+            notfolded++;
         }
     }
 
-    players[windex].money += curPot;
-    let moneyGUI = playersGUI[windex].getElementsByClassName('moneyCount');
-    moneyGUI[0].innerText = `$${players[windex].money}`;
-
-    curPot = 0;
-    potGUI.innerText = `Current Pot - $${curPot}`;
-
-    dealPhase = 5;
     return windex;
-
 }
 
 function scoreHand (hand) {
