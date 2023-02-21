@@ -69,7 +69,8 @@ function dealPlayers () {
 function resetDeal () {
     for (let n = 0; n < numPlayers; n++) {
         playerHands[n].c1 = '';
-        players[n].fold = false;
+        if (players[n].money > 0) players[n].fold = false;
+        else players[n].fold = true;
     }
     for (let n = 0; n < numPlayers; n++) {
         playerHands[n].c2 = '';

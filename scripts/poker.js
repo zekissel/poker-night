@@ -9,8 +9,6 @@ let curMove = (curDealer + 3) % numPlayers;
 let minCall = 0;
 let newround = false;
 
-const sleep_timer = 500;
-
 const players = [ { name: 'P1', money: 500, role: 'D', call: 0, fold: false },
                   { name: 'Alice', money: 500, role: 'SB', call: 0, fold: false },
                   { name: 'Bill', money: 500, role: 'BB', call: 0, fold: false }, 
@@ -204,6 +202,8 @@ accept.addEventListener('click', (e) => {
 
 function gameManager () {
 
+    // still have to handle if everyone folds, and players who are eliminated
+
     switch (dealPhase) {
 
         case 0:
@@ -241,9 +241,10 @@ function gameManager () {
             break;
         case 5:
             console.log('deal reset');
-            for (let n = 0; n < 5; n++) card_bg[n].style.backgroundColor = '#252627';
+
             resetDeal();
             rotateButton();
+            for (let n = 0; n < 5; n++) if (!players[n+1].fold)card_bg[n].style.backgroundColor = '#252627';
             
             prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
             popUp.appendChild(confirm);
@@ -290,6 +291,10 @@ raiseButton.addEventListener('click', (e) => {
         minCall = raiseValue;
         potGUI.innerText = `Current Pot - $${curPot}`;
         console.log('i raised');
+
+        betSlider.value = 0;
+        raiseValue = 0;
+        raiseButton.value = `Raise - $0`;
         endPlayerMove();
     }
 });
@@ -298,7 +303,7 @@ const betSlider = document.getElementById('slider');
 betSlider.addEventListener('click', (e) => {
 
     let myMoney = players[0].money;
-    let bet = Math.floor(myMoney * (e.target.value / 100));
+    let bet = Math.floor(myMoney * (e.target.value / 100) / 10) * 10;
     raiseValue = bet;
 
     if (bet == myMoney) raiseButton.value = `All In - $${bet}`;
@@ -316,6 +321,14 @@ foldButton.addEventListener('click', (e) => {
 const skipButton = document.getElementById('skip');
 skipButton.addEventListener('click', (e) => {
     console.log('test skip');
+    if (sleep_timer > 0) {
+        sleep_timer = 0;
+        skipButton.style.backgroundColor = '#596069';
+    }
+    else {
+        sleep_timer = 500;
+        skipButton.style.backgroundColor = '#252627';
+    }
 });
 
 function playerMove (ret) {

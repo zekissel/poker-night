@@ -1,4 +1,5 @@
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+let sleep_timer = 500;
 
 const card_bg = document.getElementsByClassName('names');
 
