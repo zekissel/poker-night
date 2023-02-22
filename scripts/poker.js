@@ -15,10 +15,10 @@ let newround = false;
 const startMoney = 1000;
 
 const players = [ { name: 'P1', money: startMoney, role: 'D', call: 0, fold: false },
-                  { name: 'Alice', money: startMoney, role: 'SB', call: 0, fold: false },
+                  { name: 'Ari', money: startMoney, role: 'SB', call: 0, fold: false },
                   { name: 'Bill', money: startMoney, role: 'BB', call: 0, fold: false }, 
-                  { name: 'Chauncy', money: startMoney, role: '', call: 0, fold: false },
-                  { name: 'Denise', money: startMoney, role: '', call: 0, fold: false },
+                  { name: 'Chris', money: startMoney, role: '', call: 0, fold: false },
+                  { name: 'Denny', money: startMoney, role: '', call: 0, fold: false },
                   { name: 'Etho', money: startMoney, role: '', call: 0, fold: false } ];
 
 const rawPlayersGUI = document.getElementsByClassName('players');
@@ -282,7 +282,13 @@ function gameManager () {
             if (testFold() === false) {
             /* card reveal and round decider function */
                 let winner = showdown();
-                updateWinner(winner);
+                if (Array.isArray(winner) && winner.length > 1) {
+                    splitWinner(winner);
+                } else if (Array.isArray(winner) && winner.length == 1) {
+                    updateWinner(winner[0]);
+                } else {
+                    updateWinner(winner);
+                }
             } else updateWinner(testFold());
             break;
 
@@ -317,6 +323,10 @@ function updateWinner (windex) {
     prompt.nodeValue = msg;
     popUp.appendChild(accept);
     document.body.appendChild(popUp);
+}
+
+function splitWinner (arr) {
+
 }
 
 

@@ -114,7 +114,7 @@ function showdown () {
             p_hand.c6 = communityCards.t;
             p_hand.c7 = communityCards.r;
             finalists.push(p_hand);
-            updateHistory(0,0,`${players[p].name}'s hand: ${p_hand.c1} + ${p_hand.c2}`);
+            updateHistory(0,0,`${players[p].name}'s hand: ${p_hand.c1} & ${p_hand.c2}`);
         }
     }
 
@@ -138,27 +138,32 @@ function showdown () {
         }
         else if (scores[s] == winner) tie_break = true;
     }
+
+    tie_break = false;
     if (tie_break) {
         // implement tiebreak
-    }
-    // change this to possibly split pot
-    windex = 0;
-    while (scores[windex] != winner) {
-        windex++;
-    }
-
-    let notfolded = 0;
-    for (let i = 0; i < numPlayers; i++) {
-        if (!players[i].fold) {
-            if (notfolded == windex) {
-                windex = i;
-                break;
-            }
-            notfolded++;
+        
+        
+    } else {
+        // change this to possibly split pot
+        let windex = 0;
+        while (scores[windex] != winner) {
+            windex++;
         }
-    }
 
-    return windex;
+        let notfolded = 0;
+        for (let i = 0; i < numPlayers; i++) {
+            if (!players[i].fold) {
+                if (notfolded == windex) {
+                    windex = i;
+                    break;
+                }
+                notfolded++;
+            }
+        }
+
+        return windex;
+    }
 }
 
 function scoreHand (hand) {
@@ -243,7 +248,7 @@ function testStraight (ranks) {
 
 }
 
-function findHighCard (hands, scores, winscore) {
+function settleTie (hands, scores, winscore) {
 
     let tiebreak = [];
 
@@ -252,8 +257,8 @@ function findHighCard (hands, scores, winscore) {
             let suits = { C: 0, D: 0, H: 0, S: 0 };
             let ranks = { A: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 0: 0, J: 0, Q: 0, K: 0 };
             for (let c in hands[i]) {
-                suits[hand[c].slice(1)]++;
-                ranks[hand[c].slice(0,1)]++;
+                suits[c.slice(1)]++;
+                ranks[c.slice(0,1)]++;
             }
             switch (winscore) {
                 case 1:
@@ -271,26 +276,87 @@ function findHighCard (hands, scores, winscore) {
                     break;
                 case 3:
                     // full house
+                    let hcs = [];
+                    for (let r in ranks) {
+                        if (ranks[r] == 3 && !isNaN(r) && r != 0) hcs.push(r);
+                        else if (ranks[r] == 3 && !isNaN(r) && r == 0) hcs.push(10);
+                        else if (ranks[r] == 3) hcs.push(toNum(r));
 
+                        else if (ranks[r] > 1 && !isNaN(r) && r != 0) hcs.push(r);
+                        else if (ranks[r] > 1 && !isNaN(r) && r == 0) hcs.push(10);
+                        else if (ranks[r] > 1) hcs.push(toNum(r));
+                    }
+                    tiebreak.push(hcs);
                     break;
                 case 4:
                     // flush
+                    let suit;
+                    for (let s in suits) {
+                        if (suits[s] == 5) suit = s;
+                    }
+                    for (let c in hands[i]) {
+                        if (suits[hands[c].slice(1)] != suit) {
+                            ranks[hands[c].slice(0,1)]--;
+                        }
+                    }
+                    let hc = 0;
+                    for (let r in ranks) {
+                        if (ranks[r] > 1 && !isNaN(r) && r != 0) hc = r;
+                        else if (ranks[r] > 1 && !isNaN(r) && r == 0) hc = 10;
+                        else if (ranks[r] > 1) hc = toNum(r);
+                    }
+                    tiebreak.push(hc);
                     break;
                 case 6:
                     // three of a kind
+                    let hc3 = 0;
+                    for (let r in ranks) {
+                        if (ranks[r] == 3 && !isNaN(r) && r != 0 && r > hc3) hc3 = r;
+                        else if (ranks[r] == 3 && !isNaN(r) && r == 0 && 10 > hc3) hc3 = 10;
+                        else if (ranks[r] == 3 && toNum(r) > hc3) hc3 = toNum(r);
+                    }
+                    tiebreak.push(hc3);
                     break;
                 case 7:
                     // two pair
+                    let hc2 = [];
+                    for (let r in ranks) {
+                        if (ranks[r] == 2 && !isNaN(r) && r != 0) hc2.push(r);
+                        else if (ranks[r] == 2 && !isNaN(r) && r == 0) hc2.push(r);
+                        else if (ranks[r] == 2) hc2.push(toNum(r));
+                    }
+                    tiebreak.push(hc2);
                     break;
                 case 8:
                     // one pair
+                    let hc1 = 0;
+                    let hi = 0;
+                    for (let r in ranks) {
+                        if (ranks[r] == 2 && !isNaN(r) && r != 0 && r > hc1) hc1 = r;
+                        else if (ranks[r] == 2 && !isNaN(r) && r == 0 && 10 > hc1) hc1 = 10;
+                        else if (ranks[r] == 2 && toNum(r) > hc1) hc1 = toNum(r);
+
+                        if (ranks[r] > 0 && !isNaN(r) && r != 0 && r > hi) hi = r;
+                        else if (ranks[r] > 0 && !isNaN(r) && r > 0 && 10 > hi) hi = 10;
+                        else if (ranks[r] > 0 && toNum(r) > hi) hi = toNum(r);
+                    }
+                    tiebreak.push([hc1, hi]);
                     break;
                 case 9:
                     //high card
+                    let hc0 = 0;
+                    for (let r in ranks) {
+                        if (ranks[r] > 1 && !isNaN(r) && r != 0 && r > hc0) hc0 = r;
+                        else if (ranks[r] > 1 && !isNaN(r) && r == 0 && 10 > hc0) hc0 = 10;
+                        else if (ranks[r] > 1 && toNum(r) > hc0) hc0 = toNum(r);
+                    }
+                    tiebreak.push(hc0);
                     break;
             }
         }
     }
+
+    return tiebreak;
 }
 
 function getStraightHC (ranks) {
