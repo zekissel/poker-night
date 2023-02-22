@@ -129,41 +129,127 @@ function showdown () {
     console.log(finalists);
     console.log(scores);
     
-    let winner = 10;
-    let tie_break = false;
-    for (let s = 0; s < scores.length; s++) {
-        if (scores[s] < winner) {
-            winner = scores[s];
-            tie_break = false;
+    let winscore = 10;
+    let windex = [];
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i][0] < winscore) {
+            winscore = scores[i][0];
+            windex = [];
+            windex.push(i);
+        } else if (scores[i][0] == winscore) {
+            windex.push(i);
         }
-        else if (scores[s] == winner) tie_break = true;
     }
 
-    tie_break = false;
-    if (tie_break) {
-        // implement tiebreak
-        
-        
-    } else {
-        // change this to possibly split pot
-        let windex = 0;
-        while (scores[windex] != winner) {
-            windex++;
-        }
+    if (windex.length == 1) return adjustedWindex(windex[0]);
 
-        let notfolded = 0;
-        for (let i = 0; i < numPlayers; i++) {
+    windex = tieBreak(scores, winscore, 0);
+    if (windex.length == 1) return adjustedWindex(windex[0]);
+
+
+    if (winscore != 7 && winscore != 8) return normalized(windex);
+
+    let high = 0;
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i][0] == winscore) {
+            if (scores[i][2] > high) {
+                high = scores[i][2];
+                windex = [];
+                windex.push(i);
+            } else if (scores[i][2] == high) {
+                windex.push(i);
+            }
+            break;
+        }
+    }
+
+    if (windex.length == 1) return adjustedWindex(windex[0]);
+
+    high = 0;
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i][0] == winscore) {
+            if (scores[i][3] > high) {
+                high = scores[i][3];
+                windex = [];
+                windex.push(i);
+            } else if (scores[i][3] == high) {
+                windex.push(i);
+            }
+            break;
+        }
+    }
+
+    if (windex.length == 1) return adjustedWindex(windex[0]);
+
+
+    return normalized(windex);
+}
+
+function adjustedWindex (index) {
+    let notfolded = 0;
+    for (let i = 0; i < numPlayers; i++) {
+        if (!players[i].fold) {
+            if (notfolded == index) {
+                return i;
+            }
+            notfolded++;
+        }
+    }
+}
+
+function normalized (index) {
+    let ret = [];
+
+    for (let i = 0; i < index.length; i++) {
+        let find = index[i];
+        let stillin = 0;
+        for (let j = 0; j < numPlayers; j++) {
             if (!players[i].fold) {
-                if (notfolded == windex) {
-                    windex = i;
-                    break;
-                }
-                notfolded++;
+                if (find == stillin) ret.push(j);
+                stillin++;
             }
         }
-
-        return windex;
     }
+    return ret;
+}
+
+function tieBreak (scores, winscore, ind) {
+    let high = 0;
+    let windex = [];
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i][0] == winscore) {
+            switch (winscore) {
+                case 1:
+                case 2:
+                case 5:
+                case 6:
+                case 3:
+                case 4:
+                case 9:
+                    if (scores[i][1 + ind] > high) {
+                        high = scores[i][1 + ind];
+                        windex = [];
+                        windex.push(i);
+                    } else if (scores[i][1 + ind] == high) {
+                        windex.push(i);
+                    }
+                    break;
+
+                case 7:
+                case 8:
+
+                    if (scores[i][1][ind] > high) {
+                        high = scores[i][1][ind];
+                        windex = [];
+                        windex.push(i);
+                    } else if (scores[i][1][ind] == high) {
+                        windex.push(i);
+                    }
+                    break;
+            }
+        }
+    }
+    return windex;
 }
 
 function scoreHand (hand) {
@@ -171,10 +257,13 @@ function scoreHand (hand) {
     let suits = { C: 0, D: 0, H: 0, S: 0 };
     let ranks = { A: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 0: 0, J: 0, Q: 0, K: 0 };
     let fouroak = false;
+    let fourcard = 0;
     let flush = false;
     let straight = false;
     let threeoak = false;
+    let threecard = 0;
     let pairs = 0;
+    let twocard = [];
 
     for (let c in hand) {          // populate suits and ranks objects
         suits[hand[c].slice(1)]++;
@@ -185,9 +274,22 @@ function scoreHand (hand) {
 
         if (ranks[r] == 4) {
             fouroak = true;
+            if (!isNaN(r) && r != 0) fourcard = r;
+            else if (!isNaN(r) && r == 0) fourcard = 10;
+            else fourcard = toNum(r);
         }
-        if (ranks[r] == 3) threeoak = true;
-        if (ranks[r] == 2) pairs++;
+        if (ranks[r] == 3) {
+            threeoak = true;
+            if (!isNaN(r) && r != 0) threecard = r;
+            else if (!isNaN(r) && r == 0) threecard = 10;
+            else threecard = toNum(r);
+        }
+        if (ranks[r] == 2) {
+            pairs++;
+            if (!isNaN(r) && r != 0) twocard.push(r);
+            else if (!isNaN(r) && r == 0) twocard.push(10);
+            else twocard.push(toNum(r));
+        }
     }
 
     for (let s in suits) {
@@ -203,15 +305,40 @@ function scoreHand (hand) {
 
     straight = testStraight(ranks);
 
-    if (straight & flush) return 1;
-    if (fouroak) return 2;
-    if (threeoak && pairs > 0) return 3;
-    if (flush) return 4;
-    if (straight) return 5;
-    if (threeoak) return 6;
-    if (pairs > 1) return 7;
-    if (pairs > 0) return 8;
-    else return 9;
+    let highCard = 0; let highCard2 = 0;
+    for (let r in ranks) {
+        if (ranks[r] > 0) {
+
+            if (!isNaN(r) && r != 0 && r > highCard) {
+                highCard = r;
+            } else if (!isNaN(r) && r == 0 && 10 > highCard) {
+                highCard = 10;
+            } else if (isNaN(r) && toNum(r) > highCard) {
+                highCard = toNum(r);
+            }
+        }
+    }
+    for (let r in ranks) {
+        if (ranks[r] > 0) {
+            if (!isNaN(r) && r != 0 && r < highCard && r > highCard2) {
+                highCard2 = r;
+            } else if (!isNaN(r) && r == 0 && 10 < highCard && 10 > highCard2) {
+                highCard2 = 10;
+            } else if (isNaN(r) && toNum(r) < highCard && toNum(r) > highCard2) {
+                highCard2 = toNum(r);
+            }
+        }
+    }
+
+    if (straight & flush) return [1, getStraightHC(ranks)];
+    if (fouroak) return [2, fourcard];
+    if (threeoak && pairs > 0) return [3, threecard, twocard];
+    if (flush) return [4, highCard, highCard2];
+    if (straight) return [5, getStraightHC(ranks)];
+    if (threeoak) return [6, threecard];
+    if (pairs > 1) return [7, twocard, highCard];
+    if (pairs > 0) return [8, twocard, highCard, highCard2];
+    else return [9, highCard, highCard2];
 
 }
 
@@ -246,117 +373,6 @@ function testStraight (ranks) {
     
     return false;
 
-}
-
-function settleTie (hands, scores, winscore) {
-
-    let tiebreak = [];
-
-    for (let i = 0; i < scores.length; i++) {
-        if (scores[i] == winscore) {
-            let suits = { C: 0, D: 0, H: 0, S: 0 };
-            let ranks = { A: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 0: 0, J: 0, Q: 0, K: 0 };
-            for (let c in hands[i]) {
-                suits[c.slice(1)]++;
-                ranks[c.slice(0,1)]++;
-            }
-            switch (winscore) {
-                case 1:
-                case 5: 
-                // straight flush and straight
-                    tiebreak.push(getStraightHC(ranks));
-                    break;
-                case 2:
-                    // four of a kind
-                    for (let r in ranks) {
-                        if (ranks[r] == 4 && !isNaN(r) && r != 0) tiebreak.push(r);
-                        else if (ranks[r] == 4 && !isNaN(r) && r == 0) tiebreak.push(10);
-                        else if (ranks[r] == 4) tiebreak.push(toNum(r)); 
-                    }
-                    break;
-                case 3:
-                    // full house
-                    let hcs = [];
-                    for (let r in ranks) {
-                        if (ranks[r] == 3 && !isNaN(r) && r != 0) hcs.push(r);
-                        else if (ranks[r] == 3 && !isNaN(r) && r == 0) hcs.push(10);
-                        else if (ranks[r] == 3) hcs.push(toNum(r));
-
-                        else if (ranks[r] > 1 && !isNaN(r) && r != 0) hcs.push(r);
-                        else if (ranks[r] > 1 && !isNaN(r) && r == 0) hcs.push(10);
-                        else if (ranks[r] > 1) hcs.push(toNum(r));
-                    }
-                    tiebreak.push(hcs);
-                    break;
-                case 4:
-                    // flush
-                    let suit;
-                    for (let s in suits) {
-                        if (suits[s] == 5) suit = s;
-                    }
-                    for (let c in hands[i]) {
-                        if (suits[hands[c].slice(1)] != suit) {
-                            ranks[hands[c].slice(0,1)]--;
-                        }
-                    }
-                    let hc = 0;
-                    for (let r in ranks) {
-                        if (ranks[r] > 1 && !isNaN(r) && r != 0) hc = r;
-                        else if (ranks[r] > 1 && !isNaN(r) && r == 0) hc = 10;
-                        else if (ranks[r] > 1) hc = toNum(r);
-                    }
-                    tiebreak.push(hc);
-                    break;
-                case 6:
-                    // three of a kind
-                    let hc3 = 0;
-                    for (let r in ranks) {
-                        if (ranks[r] == 3 && !isNaN(r) && r != 0 && r > hc3) hc3 = r;
-                        else if (ranks[r] == 3 && !isNaN(r) && r == 0 && 10 > hc3) hc3 = 10;
-                        else if (ranks[r] == 3 && toNum(r) > hc3) hc3 = toNum(r);
-                    }
-                    tiebreak.push(hc3);
-                    break;
-                case 7:
-                    // two pair
-                    let hc2 = [];
-                    for (let r in ranks) {
-                        if (ranks[r] == 2 && !isNaN(r) && r != 0) hc2.push(r);
-                        else if (ranks[r] == 2 && !isNaN(r) && r == 0) hc2.push(r);
-                        else if (ranks[r] == 2) hc2.push(toNum(r));
-                    }
-                    tiebreak.push(hc2);
-                    break;
-                case 8:
-                    // one pair
-                    let hc1 = 0;
-                    let hi = 0;
-                    for (let r in ranks) {
-                        if (ranks[r] == 2 && !isNaN(r) && r != 0 && r > hc1) hc1 = r;
-                        else if (ranks[r] == 2 && !isNaN(r) && r == 0 && 10 > hc1) hc1 = 10;
-                        else if (ranks[r] == 2 && toNum(r) > hc1) hc1 = toNum(r);
-
-                        if (ranks[r] > 0 && !isNaN(r) && r != 0 && r > hi) hi = r;
-                        else if (ranks[r] > 0 && !isNaN(r) && r > 0 && 10 > hi) hi = 10;
-                        else if (ranks[r] > 0 && toNum(r) > hi) hi = toNum(r);
-                    }
-                    tiebreak.push([hc1, hi]);
-                    break;
-                case 9:
-                    //high card
-                    let hc0 = 0;
-                    for (let r in ranks) {
-                        if (ranks[r] > 1 && !isNaN(r) && r != 0 && r > hc0) hc0 = r;
-                        else if (ranks[r] > 1 && !isNaN(r) && r == 0 && 10 > hc0) hc0 = 10;
-                        else if (ranks[r] > 1 && toNum(r) > hc0) hc0 = toNum(r);
-                    }
-                    tiebreak.push(hc0);
-                    break;
-            }
-        }
-    }
-
-    return tiebreak;
 }
 
 function getStraightHC (ranks) {

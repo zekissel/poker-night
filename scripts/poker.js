@@ -282,10 +282,8 @@ function gameManager () {
             if (testFold() === false) {
             /* card reveal and round decider function */
                 let winner = showdown();
-                if (Array.isArray(winner) && winner.length > 1) {
+                if (Array.isArray(winner)) {
                     splitWinner(winner);
-                } else if (Array.isArray(winner) && winner.length == 1) {
-                    updateWinner(winner[0]);
                 } else {
                     updateWinner(winner);
                 }
@@ -326,6 +324,28 @@ function updateWinner (windex) {
 }
 
 function splitWinner (arr) {
+
+    let split = arr.length;
+
+    let msg = `Pot of $${curPot} split between `;
+    for (let i = 0; i < arr.length; i++) {
+        msg += ` ${players[i].name},`;
+    }
+    msg += `!`;
+
+    /*
+    players[windex].money += curPot;
+    let moneyGUI = playersGUI[windex].getElementsByClassName('moneyCount');
+    moneyGUI[0].innerText = `$${players[windex].money}`;
+    */
+   
+    curPot = 0;
+    potGUI.innerText = `Current Pot: $${curPot}`;
+
+    dealPhase = 5;
+    prompt.nodeValue = msg;
+    popUp.appendChild(accept);
+    document.body.appendChild(popUp);
 
 }
 
