@@ -8,9 +8,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" type="text/css" href="style/main.css">
+        <!--
         <script defer src="scripts/dealer.js"></script>
         <script defer src="scripts/poker.js"></script>
         <script defer src="scripts/bot.js"></script>
+        -->
+        <script defer src="scripts/player.js"></script>
+        <script defer src="scripts/game.js"></script>
+        <script defer src="scripts/interface.js"></script>
 
     </head>
     <body>
@@ -23,10 +28,10 @@
 
             <div class="sideColumn">
                 <h2>Other Players</h2>
-                <div class="players"><span class="names">Ari</span><span class="moneyCount">$1000</span><span class="blind">SB</span></div>
-                <div class="players"><span class="names">Bill</span><span class="moneyCount">$1000</span><span class="blind">BB</span></div>
-                <div class="players"><span class="names">Chris</span><span class="moneyCount">$1000</span><span class="blind"></span></div>
-                <div class="players"><span class="names">Denny</span><span class="moneyCount">$1000</span><span class="blind"></span></div>
+                <div class="players"><span class="names">Ana</span><span class="moneyCount">$1000</span><span class="blind">SB</span></div>
+                <div class="players"><span class="names">Bob</span><span class="moneyCount">$1000</span><span class="blind">BB</span></div>
+                <div class="players"><span class="names">Cree</span><span class="moneyCount">$1000</span><span class="blind"></span></div>
+                <div class="players"><span class="names">Dan</span><span class="moneyCount">$1000</span><span class="blind"></span></div>
                 <div class="players"><span class="names">Etho</span><span class="moneyCount">$1000</span><span class="blind"></span></div>
 
                 <hr style="border: 1px solid black;">
@@ -63,11 +68,11 @@
 
             <div class="sideColumn">
                 <h2>Actions</h2>
-                <div class="action"><input id="check" type="button" value="Check"></div>
+                <div class="action"><input id="check" type="button" value="Check" disabled></div>
                 <div class="action">
-                    <input type="button" value="Raise - $0" id="raise"><input id="slider" type="range" value="0" min="0" max="100">
+                    <input type="button" value="Raise - $0" id="raise" disabled><input id="slider" type="range" value="0" min="0" max="100">
                 </div>
-                <div class="action"><input id="fold" type="button" value="Fold"></div>
+                <div class="action"><input id="fold" type="button" value="Fold" disabled></div>
                 <div class="action"><input id="skip" type="button" value="Skip"></div>
             </div>
 
