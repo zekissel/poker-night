@@ -24,7 +24,7 @@ class Player {
         foldButton.disabled = false;
         if (!recall) raiseButton.disabled = false;
 
-        if (poker.minCall > 0) checkButton.value = `Call: $${poker.minCall}`;
+        if (poker.minCall - this.call > 0) checkButton.value = `Call: $${poker.minCall - this.call}`;
         else checkButton.value = `Check`;
 
         const card_bg = document.getElementById('privateCards');

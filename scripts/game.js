@@ -81,6 +81,7 @@ class Game {
                 for (let p = 0; p < this.numPlayers; p++) {
                     if (poker.players[p].elim) {
                         if (p != 0) poker.players[p].nameGUI.style.backgroundColor = `${color_elim}`;
+                        poker.players[p].blindGUI.innerText = '';
                         this.eliminatePlayer(p);
                     }
                 }
@@ -181,6 +182,7 @@ class Game {
                 }
                 curMove = (curMove + 1) % this.numPlayers;
             }
+            await sleep(sleep_timer);
             this.resetBets();
 
         } else {
