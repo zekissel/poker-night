@@ -70,6 +70,10 @@ window.addEventListener("load", (e) => {
 /* continue to deal or to round reset */
 accept.addEventListener('click', (e) => {
     
+    if (accept.innerText == `Play Again`) {
+        location.reload(); return;
+    }
+    
     document.body.removeChild(popUp);
     poker.manager();
 });

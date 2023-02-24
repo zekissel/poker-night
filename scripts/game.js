@@ -30,9 +30,7 @@ class Game {
     }
 
     /* manage phases of deal for each round */
-    manager (wait) {
-
-        if (wait === true) return;
+    manager () {
         
         switch (this.dealer.dealPhase) {
             case 0: 
@@ -78,18 +76,21 @@ class Game {
 
             case 5:
                 this.dealer.resetDeal();
-                for (let p = 0; p < this.numPlayers; p++) {
-                    if (poker.players[p].elim) {
-                        if (p != 0) poker.players[p].nameGUI.style.backgroundColor = `${color_elim}`;
-                        poker.players[p].blindGUI.innerText = '';
-                        this.eliminatePlayer(p);
+                for (let p of poker.players) {
+                    if (p.elim) {
+                        if (p.index != 0) {
+                            p.nameGUI.style.backgroundColor = `${color_elim}`;
+                            p.blindGUI.innerText = '';
+                            this.eliminatePlayer(p);
+                        } else this.endGame(); return;
+                    } else if (p.index != 0) {
+                        p.nameGUI.style.backgroundColor = `${color_inactive}`;
                     }
                 }
                 this.dealer.curDealer = (this.dealer.curDealer + 1) % poker.numPlayers;
                 this.rotateBlinds();
                 prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
                 accept.innerText = `Deal`;
-                popUp.appendChild(accept);
                 document.body.appendChild(popUp);
                 break;
             }
@@ -253,6 +254,12 @@ class Game {
         this.dealer.dealPhase = 5;
         prompt.nodeValue = msg;
         accept.innerText = `Continue`;
+        document.body.appendChild(popUp);
+    }
+
+    endGame () {
+        prompt.nodeValue = `You busted! Good game.`;
+        accept.innerText = `Play Again`;
         document.body.appendChild(popUp);
     }
 

@@ -100,7 +100,7 @@ class Bot extends Player {
             poker.curPot += bet;
             potGUI.innerText = `Current Pot: $${poker.curPot}`;
         }
-        if (bet <= 0) updateHistory(`${this.name} checked`);
+        if (bet <= 0 || this.money == 0) updateHistory(`${this.name} checked`);
         else updateHistory(`${this.name} called $${bet}`);
 
     }
@@ -146,7 +146,7 @@ class Bot extends Player {
 
         if (poker.dealer.dealPhase < 2) return mult;
         
-        
+
 
         return mult;
     }
