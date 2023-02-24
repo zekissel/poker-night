@@ -174,9 +174,156 @@ skipButton.addEventListener('click', (e) => {
 });
 
 /* return array of scores and highcards */
-function scoreHands(playerArr, comCards) {
+function showdown(playerArr, comCards) {
 
+    let hands = [];
+
+    for (let n = 0; n < playerArr.length; n++) {
+        if (playerArr[n].fold) hands.push([false]);
+        else {
+            hands.push( [ playerArr[n].card1, playerArr[n].card2, 
+                         comCards[0], comCards[1], comCards[2], 
+                         comCards[3], comCards[4] ] );
+            updateHistory(`${playerArr[n].name}'s hand: ${playerArr[n].card1} & ${playerArr[n].card2}`);
+        }
+    }
+
+    let scores = [];
+    /* score hands with format [[hand rank straight flush (1) - high card (9), relavent highcard, highcard 2], player index] */
+    for (let h = 0; h < hands.length; h++) if (hands[h][0] !== false) {
+        scores.push(scoreHands(hands[h], h));
+    }
     
+    for (let s of scores) console.log(`${poker.players[s[1]].name}: ${s[0][0]}, HC's: ${s[0][1]}, ${s[0][2]}`);
+    console.log(``);
+    
+    let windex = [];
+    let winscore = 10;
+    for (let s of scores) {
+        if (s[0][0] < winscore) {
+            winscore = s[0][0];
+            windex = [];
+            windex.push(s[1]);
+        } else if (s[0][0] == winscore) windex.push(s[1]);
+    }
+    if (windex.length == 1) return windex[0];
 
-    return 0;
+    /* settle tie by first high card */
+    let tie = 0;
+    for (let s of scores) {
+        if (s[0][0] == winscore) {
+            if (s[0][1] > tie) {
+                tie = s[0][1];
+                windex = [];
+                windex.push(s[1]);
+            } else if (s[0][1] == tie) windex.push(s[1]);
+        }
+    }
+    if (windex.length == 1) return windex[0];
+
+    tie = 0;
+    for (let s of scores) {
+        if (s[0][0] == winscore) {
+            if (s[0][2] > tie) {
+                tie = s[0][2];
+                windex = [];
+                windex.push(s[1]);
+            } else if (s[0][2] == tie) windex.push(s[1]);
+        }
+    }
+    if (windex.length == 1) return windex[0];
+    return windex;
+}
+
+function scoreHands (hand, index) {
+
+    let suits = { C: 0, D: 0, H: 0, S: 0 };
+    let ranks = { A: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, T: 0, J: 0, Q: 0, K: 0 };
+    let myCards = [toNum(hand[0].slice(0,1)), toNum(hand[1].slice(0,1))].sort( (a,b) => {
+        if (a < b) return 1;
+        if (a > b) return -1;
+        else return 0;
+    });
+
+    /* populate suits and ranks objects */
+    for (let c in hand) {
+        suits[hand[c].slice(1)]++;
+        ranks[hand[c].slice(0,1)]++;
+    }
+
+    let flush = false;
+    for (let s in suits) {
+        if (suits[s] == 5) {
+            flush = true;
+            for (let c in hand) {
+                /* make sure 6th and 7th cards cannot contribute to straight or high cards */
+                if (suits[hand[c].slice(1)] != s) {
+                    ranks[hand[c].slice(0,1)]--;
+                }
+            }
+        }
+    }
+
+    let threecard = [];
+    let pairs = [];
+    for (let r in ranks) {
+        if (ranks[r] > 0) {
+            /* test for four/three of a kind and pairs */
+            if (ranks[r] == 4 && !isNaN(r)) return [[2, Number(r), myCards[0]], index];
+            else if (ranks[r] == 4 && isNaN(r)) return [[2, toNum(r), myCards[0]], index];
+
+            if (ranks[r] == 3 && !isNaN(r)) threecard.push(Number(r));
+            else if (ranks[r] == 3 && isNaN(r)) threecard.push(toNum(r));
+
+            if (ranks[r] == 2 && !isNaN(r)) pairs.push(Number(r));
+            else if (ranks[r] == 2 && isNaN(r)) pairs.push(toNum(r));
+        }
+    }
+    /* full house better than flush, no chance for straight */
+    if (threecard.length > 0 && pairs.length > 0) return [[3, Math.max(threecard), Math.max(pairs)], index];
+
+    let straight = testStraight(ranks);
+
+    /* return straights, flushes, and straight flushes */
+    if (straight !== false) {
+        if (flush) straight[0] = 1;
+        return [straight, index];
+    }
+    if (flush) return [[4, myCards[0], myCards[1]], index];
+
+    if (threecard.length > 0) return [[6, Math.max(threecard), myCards[0] == Math.max(threecard) ? myCards[1] : myCards[0]], index];
+    if (pairs.length > 1) return [[7, myCards[0], myCards[1]], index];
+    if (pairs.length > 0) return [[8, Math.max(pairs), myCards[0] == Math.max(pairs) ? myCards[1] : myCards[0]], index];
+    return [[9, myCards[0], myCards[1]], index];
+}
+
+function testStraight (ranks) {
+    let run = 0;
+    for (let i = 15; i > 0; i--) {
+        let c;
+        if (i == 1 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14) {
+            switch (i) {
+                case 10: c = 'T'; break;
+                case 11: c = 'J'; break;
+                case 12: c = 'Q'; break;
+                case 13: c = 'K'; break;
+                default: c = 'A';
+            }
+        } else c == i;
+
+        run = ranks[c] > 0 ? run + 1 : 0;
+        if (run == 5) return [5, c + 4, 0];
+    }
+    return false;
+}
+
+function toNum (rank) {
+    switch (rank) {
+        case 'A': return Number(14);
+        case 'K': return Number(13);
+        case 'Q': return Number(12);
+        case 'J': return Number(11);
+        case 'T': return Number(10);
+        default: return Number(rank);
+    }
 }

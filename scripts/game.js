@@ -70,7 +70,7 @@ class Game {
             case 4:
                 if (this.getRemPlayers() > 1) {
                     /* decide winning hand */
-                    let winner = scoreHands(this.players, this.dealer.communityCards);
+                    let winner = showdown(this.players, this.dealer.communityCards);
                     if (Array.isArray(winner)) this.splitWinner(winner);
                     else this.roundWinner(winner);
                 } else this.defaultWinner();
@@ -220,10 +220,10 @@ class Game {
     splitWinner (indices) {
         let msg = `Pot of $${this.curPot} split between `;
         let share = this.curPot / indices.length;
-        for (let i of indices) {
-            this.players[i].money += share;
-            this.players[i].moneyGUI.innerText = `$${this.players[i].money}`;
-            msg += `${this.players[i].name}, `;
+        for (let i = 0; i < indices.length; i++) {
+            this.players[indices[i]].money += share;
+            this.players[indices[i]].moneyGUI.innerText = `$${this.players[indices[i]].money}`;
+            msg += `${this.players[indices[i]].name}, `;
         }
         msg = msg.slice(0, -2);
         let c = msg.lastIndexOf(',');
@@ -347,6 +347,7 @@ class Dealer {
         for (let g of comCardGUI) g.innerText = '';
         for (let g of privCardGUI) g.innerText = '';
         this.dealPhase = 0;
+        historyGUI.innerText = '';
     }
 
     /* randomize card order and reset draw count*/
