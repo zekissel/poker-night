@@ -97,6 +97,8 @@ h1 {
     float: left;
     font-size: 125%;
     background-color: var(--fg2);
+    position: relative;
+    top: 0px;
 }
 
 #mybutton {

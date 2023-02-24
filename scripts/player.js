@@ -23,6 +23,7 @@ class Player {
         checkButton.disabled = false;
         foldButton.disabled = false;
         if (!recall) raiseButton.disabled = false;
+        if (recall) raiseButton.style.color = `${color_inactive}`;
 
         if (poker.minCall - this.call > 0) checkButton.value = `Call: $${poker.minCall - this.call}`;
         else checkButton.value = `Check`;
@@ -30,6 +31,7 @@ class Player {
         const card_bg = document.getElementById('privateCards');
         card_bg.style.backgroundColor = `${color_active}`;
 
+        if (this.money == 0) this.endMove();
         if (poker.getRemPlayers() == 1) this.endMove();
     }
 
@@ -37,6 +39,7 @@ class Player {
         checkButton.disabled = true;
         raiseButton.disabled = true;
         foldButton.disabled = true;
+        raiseButton.style.color = `white`;
         const card_bg = document.getElementById('privateCards');
         card_bg.style.backgroundColor = `${color_grey}`;
 

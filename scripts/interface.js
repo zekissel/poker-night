@@ -127,9 +127,10 @@ let raiseValue = 0;
 const raiseButton = document.getElementById('raise');
 raiseButton.addEventListener('click', (e) => {
     let me = poker.players[0];
+    raiseValue = raiseValue + poker.minCall > me.money ? raiseValue : raiseValue + poker.minCall;
 
-    raiseValue += poker.minCall;
-    if (me.money >= raiseValue) {
+    if (raiseValue == poker.minCall) checkButton.click();
+    else if (me.money >= raiseValue) {
         me.call += raiseValue;
         me.money -= raiseValue;
 
@@ -149,10 +150,10 @@ raiseButton.addEventListener('click', (e) => {
 const betSlider = document.getElementById('slider');
 betSlider.addEventListener('click', (e) => {
 
-    let myMoney = poker.players[0].money;
-    raiseValue = Math.floor(myMoney * (e.target.value / 100) / 10) * 10;
+    let possibleRaise = poker.players[0].money;
+    raiseValue = Math.ceil((Math.floor(possibleRaise * e.target.value / 100)) / 5) * 5;
 
-    if (raiseValue == myMoney) raiseButton.value = `All In - $${raiseValue}`;
+    if (raiseValue == possibleRaise) raiseButton.value = `All In - $${raiseValue}`;
     else raiseButton.value = `Raise - $${raiseValue}`;
 });
 

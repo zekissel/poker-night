@@ -13,6 +13,8 @@ class Game {
     static bigBlind;
     static curPot;
 
+    static gameOver;
+
     constructor (num) {
 
         this.dealer = new Dealer();
@@ -27,6 +29,7 @@ class Game {
         this.minCall = 0;
         this.bigBlind = 20;
         this.curPot = 0;
+        this.gameOver = false;
     }
 
     /* manage phases of deal for each round */
@@ -76,23 +79,18 @@ class Game {
 
             case 5:
                 this.dealer.resetDeal();
-                for (let p of poker.players) {
-                    if (p.elim) {
-                        if (p.index != 0) {
-                            p.nameGUI.style.backgroundColor = `${color_elim}`;
-                            p.blindGUI.innerText = '';
-                            this.eliminatePlayer(p);
-                        } else this.endGame(); return;
-                    } else if (p.index != 0) {
-                        p.nameGUI.style.backgroundColor = `${color_inactive}`;
-                    }
-                }
-                this.dealer.curDealer = (this.dealer.curDealer + 1) % poker.numPlayers;
-                this.rotateBlinds();
-                prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
-                accept.innerText = `Deal`;
-                document.body.appendChild(popUp);
-                break;
+                this.eliminatePlayers();
+                
+                if (this.gameOver == 0) {
+                    this.dealer.curDealer = (this.dealer.curDealer + 1) % poker.numPlayers;
+                    this.rotateBlinds();
+                    prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
+                    accept.innerText = `Deal`;
+                    document.body.appendChild(popUp);
+                } else {
+                    if (this.gameOver == 1) this.endGame(`You busted! Good game.`);
+                    else this.endGame(`You won! Good game.`);
+                } break;
             }
     }
 
@@ -257,8 +255,8 @@ class Game {
         document.body.appendChild(popUp);
     }
 
-    endGame () {
-        prompt.nodeValue = `You busted! Good game.`;
+    endGame (msg) {
+        prompt.nodeValue = msg;
         accept.innerText = `Play Again`;
         document.body.appendChild(popUp);
     }
@@ -271,11 +269,20 @@ class Game {
     }
 
     /* remove player at index from players[] */
-    eliminatePlayer (ind) {
-        this.players.splice(ind, 1);
-        this.numPlayers--;
-        for (let i = ind; i < this.numPlayers; i++) {
-            this.players[i].index--;
+    eliminatePlayers () {
+
+        let bust = [];
+        for (let p of this.players) {
+            if (p.fold) bust.push(p.index);
+        }
+
+        if (bust.includes(0)) this.gameOver = 1;
+        else if (bust.length + 1 == this.numPlayers) this.gameOver = 2;
+        else {
+            for (let b of bust) this.players.splice(b, 1);
+
+            this.numPlayers = this.players.length;
+            for (let i = 0; i < this.numPlayers; i++) this.players[i].index = i;
         }
     }
 }
@@ -342,17 +349,20 @@ class Dealer {
     /* revoke player and community cards, reset phase */
     resetDeal () {
         for (let n = 0; n < poker.numPlayers; n++) {
-            if (poker.players[n].money == 0) poker.players[n].elim = true;
-        }
-
-        for (let n = 0; n < poker.numPlayers; n++) {
+            if (poker.players[n].money == 0) {
+                poker.players[n].elim = true;
+                poker.players[n].fold = true;
+                if (n != 0) poker.players[n].nameGUI.style.backgroundColor = `${color_elim}`;
+            } else {
+                poker.players[n].fold = false;
+                if (n != 0) poker.players[n].nameGUI.style.backgroundColor = `${color_inactive}`;
+            }
             poker.players[n].card1 = '';
             poker.players[n].card2 = '';
-            if (!poker.players[n].elim) poker.players[n].fold = false;
-            else poker.players[n].fold = true;
+            poker.players[n].blindGUI.innerText = '';
         }
         
-        for (let c in this.communityCards) c = '';
+        for (let c of this.communityCards) c = '';
         for (let g of comCardGUI) g.innerText = '';
         for (let g of privCardGUI) g.innerText = '';
         this.dealPhase = 0;
