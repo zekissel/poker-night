@@ -134,7 +134,7 @@ class Bot extends Player {
     /* return evaluation of hand 1-10 */
     analyze () {
 
-        
+         
         return 5;
     }
 }

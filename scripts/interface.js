@@ -209,36 +209,37 @@ function showdown(playerArr, comCards) {
     if (windex.length == 1) return windex[0];
 
     /* settle tie by first high card */
-    let tie = 0;
-    for (let s of scores) {
-        if (s[0][0] == winscore) {
-            if (s[0][1] > tie) {
-                tie = s[0][1];
-                windex = [];
-                windex.push(s[1]);
-            } else if (s[0][1] == tie) windex.push(s[1]);
-        }
-    }
+    windex = settleTie(winscore, scores, 1);
     if (windex.length == 1) return windex[0];
 
-    tie = 0;
+    windex = settleTie(winscore, scores, 2);
+    if (windex.length == 1) return windex[0];
+
+    if (winscore == 6 || winscore == 7 || winscore == 8) windex = settleTie(winscore, scores, 3);
+    if (windex.length == 1) return windex[0];
+
+    return windex;
+}
+
+function settleTie (winscore, scores, ind) {
+    let tie = 0;
+    let ret = [];
     for (let s of scores) {
         if (s[0][0] == winscore) {
-            if (s[0][2] > tie) {
-                tie = s[0][2];
-                windex = [];
-                windex.push(s[1]);
-            } else if (s[0][2] == tie) windex.push(s[1]);
+            if (s[0][ind] > tie) {
+                tie = s[0][ind];
+                ret = [];
+                ret.push(s[1]);
+            } else if (s[0][ind] == tie) ret.push(s[1]);
         }
     }
-    if (windex.length == 1) return windex[0];
-    return windex;
+    return ret;
 }
 
 function scoreHands (hand, index) {
 
-    let suits = { C: 0, D: 0, H: 0, S: 0 };
-    let ranks = { A: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, T: 0, J: 0, Q: 0, K: 0 };
+    let suits = { 'C': 0, 'D': 0, 'H': 0, 'S': 0 };
+    let ranks = { 'A': 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 'T': 0, 'J': 0, 'Q': 0, 'K': 0 };
     let myCards = [toNum(hand[0].slice(0,1)), toNum(hand[1].slice(0,1))].sort( (a,b) => {
         if (a < b) return 1;
         if (a > b) return -1;
@@ -264,23 +265,20 @@ function scoreHands (hand, index) {
         }
     }
 
-    let threecard = [];
     let pairs = [];
+    let threecard = [];
     for (let r in ranks) {
         if (ranks[r] > 0) {
             /* test for four/three of a kind and pairs */
-            if (ranks[r] == 4 && !isNaN(r)) return [[2, Number(r), myCards[0]], index];
-            else if (ranks[r] == 4 && isNaN(r)) return [[2, toNum(r), myCards[0]], index];
+            if (ranks[r] == 4) return [[2, toNum(r), myCards[0] != toNum(r) ? myCards[0] : myCards[1]], index];
 
-            if (ranks[r] == 3 && !isNaN(r)) threecard.push(Number(r));
-            else if (ranks[r] == 3 && isNaN(r)) threecard.push(toNum(r));
+            if (ranks[r] == 3) threecard.push(toNum(r));
 
-            if (ranks[r] == 2 && !isNaN(r)) pairs.push(Number(r));
-            else if (ranks[r] == 2 && isNaN(r)) pairs.push(toNum(r));
+            if (ranks[r] == 2) pairs.push(toNum(r));
         }
     }
     /* full house better than flush, no chance for straight */
-    if (threecard.length > 0 && pairs.length > 0) return [[3, Math.max(threecard), Math.max(pairs)], index];
+    if (threecard.length > 0 && pairs.length > 0) return [[3, Math.max(...threecard), Math.max(...pairs)], index];
 
     let straight = testStraight(ranks);
 
@@ -291,9 +289,15 @@ function scoreHands (hand, index) {
     }
     if (flush) return [[4, myCards[0], myCards[1]], index];
 
-    if (threecard.length > 0) return [[6, Math.max(threecard), myCards[0] == Math.max(threecard) ? myCards[1] : myCards[0]], index];
-    if (pairs.length > 1) return [[7, myCards[0], myCards[1]], index];
-    if (pairs.length > 0) return [[8, Math.max(pairs), myCards[0] == Math.max(pairs) ? myCards[1] : myCards[0]], index];
+    pairs.sort( (a,b) => {
+        if (a < b) return 1;
+        if (a > b) return -1;
+        else return 0;
+    });
+    while (pairs.length > 2) pairs.pop();
+    if (threecard.length > 0) return [[6, Math.max(...threecard), myCards[0], myCards[1]], index];  // [[4], 1]
+    if (pairs.length > 1) return [[7, pairs[0], pairs[1], pairs.includes(myCards[0]) ? myCards[1] : myCards[0]], index]; // [[4], 1]
+    if (pairs.length > 0) return [[8, pairs[0], myCards[0], myCards[1]], index];    // [[4], 1]
     return [[9, myCards[0], myCards[1]], index];
 }
 
