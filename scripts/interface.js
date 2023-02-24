@@ -1,12 +1,16 @@
+/* sleep timer for bots */
 let sleep_timer = 500;
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+/* pot and call GUI on document */
 const potGUI = document.getElementById('pot');
 const callGUI = document.getElementById('call');
 
+/* recent moves that alternate background color */
 const historyGUI = document.getElementById('history');
 let alt = false;
 
+/* community cards GUI */
 const flop1 = document.getElementById('cc-f1');
 const flop2 = document.getElementById('cc-f2');
 const flop3 = document.getElementById('cc-f3');
@@ -14,20 +18,24 @@ const turn = document.getElementById('cc-turn');
 const river = document.getElementById('cc-river');
 const comCardGUI = [flop1, flop2, flop3, turn, river];
 
+/* private cards GUI */
 const hand1 = document.getElementById('card1');
 const hand2 = document.getElementById('card2');
 const privCardGUI = [hand1, hand2];
 
+/* used to declare class instances of GUI for each player */
 const rawPlayersGUI = document.getElementsByClassName('players');
 const playersGUI = Array.from(rawPlayersGUI);
 const myGUI = document.getElementById('mydash');
 playersGUI.unshift(myGUI);
 
+/* colors to show active/eliminated player */
 const color_active = `#3775D3`;
 const color_inactive = `#252627`;
 const color_elim = `#A20021`;
 const color_grey = `#7E8893`;
 
+/* style for pop up window */
 const popUp = document.createElement('div');
 const prompt = document.createTextNode(`Press 'Deal' to Begin the Next Turn`);
 const accept = document.createElement('button');
@@ -52,13 +60,14 @@ popUp.appendChild(prompt);
 popUp.appendChild(accept);
 
 
+/* instantiate game */
 const poker = new Game(6);
-
-window.addEventListener("load", (e) => { 
+window.addEventListener("load", (e) => {
     
     document.body.appendChild(popUp);
 });
 
+/* continue to deal or to round reset */
 accept.addEventListener('click', (e) => {
     
     document.body.removeChild(popUp);
@@ -66,7 +75,7 @@ accept.addEventListener('click', (e) => {
 });
 
 
-
+/* add recent move to GUI */
 function updateHistory (msg) {
 
     let newItem = document.createElement("li");
@@ -78,6 +87,7 @@ function updateHistory (msg) {
 }
 
 
+/* player check/call */
 const checkButton = document.getElementById('check');
 checkButton.addEventListener('click', (e) => {
 
@@ -108,6 +118,7 @@ checkButton.addEventListener('click', (e) => {
     me.endMove();
 });
 
+/* player raise */
 let raiseValue = 0;
 const raiseButton = document.getElementById('raise');
 raiseButton.addEventListener('click', (e) => {
@@ -130,6 +141,7 @@ raiseButton.addEventListener('click', (e) => {
     }
 });
 
+/* slider to adjust raise */
 const betSlider = document.getElementById('slider');
 betSlider.addEventListener('click', (e) => {
 
@@ -140,6 +152,7 @@ betSlider.addEventListener('click', (e) => {
     else raiseButton.value = `Raise - $${raiseValue}`;
 });
 
+/* player fold */
 const foldButton = document.getElementById('fold');
 foldButton.addEventListener('click', (e) => {
     poker.players[0].fold = true;
@@ -147,6 +160,7 @@ foldButton.addEventListener('click', (e) => {
     poker.players[0].endMove();
 });
 
+/* speed up bot moves */
 const skipButton = document.getElementById('skip');
 skipButton.addEventListener('click', (e) => {
     if (sleep_timer > 0) {
@@ -159,6 +173,10 @@ skipButton.addEventListener('click', (e) => {
     }
 });
 
+/* return array of scores and highcards */
 function scoreHands(playerArr, comCards) {
+
+    
+
     return 0;
 }

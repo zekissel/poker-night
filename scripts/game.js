@@ -71,7 +71,8 @@ class Game {
                 if (this.getRemPlayers() > 1) {
                     /* decide winning hand */
                     let winner = scoreHands(this.players, this.dealer.communityCards);
-                    this.roundWinner(winner);
+                    if (Array.isArray(winner)) this.splitWinner(winner);
+                    else this.roundWinner(winner);
                 } else this.defaultWinner();
                 break;
 
@@ -84,6 +85,7 @@ class Game {
                     }
                 }
                 this.dealer.curDealer = (this.dealer.curDealer + 1) % poker.numPlayers;
+                this.rotateBlinds();
                 prompt.nodeValue = `Press 'Deal' to Begin the Next Turn`;
                 accept.innerText = `Deal`;
                 popUp.appendChild(accept);
@@ -116,17 +118,22 @@ class Game {
         this.players[sb].moneyGUI.innerText = `$${this.players[sb].money}`;
         this.players[bb].moneyGUI.innerText = `$${this.players[bb].money}`;
 
-        this.players[this.dealer.curDealer].blindGUI.innerText = `D`;
-        this.players[sb].blindGUI.innerText = `SB`;
-        this.players[bb].blindGUI.innerText = `BB`;
-        for (let i = 0; i < this.numPlayers; i++) if (i != sb && i != bb && i != this.dealer.curDealer) 
-            this.players[i].blindGUI.innerText = ``;
-
         this.curPot += this.players[sb].call + this.players[bb].call;
         potGUI.innerText = `Current Pot: $${this.curPot}`;
 
         this.minCall = this.bigBlind;
         callGUI.innerText = `Current minimum call: $${this.minCall}`;
+    }
+
+    rotateBlinds () {
+        let sb = (this.dealer.curDealer + 1) % this.numPlayers;
+        let bb = (this.dealer.curDealer + 2) % this.numPlayers;
+
+        this.players[this.dealer.curDealer].blindGUI.innerText = `D`;
+        this.players[sb].blindGUI.innerText = `SB`;
+        this.players[bb].blindGUI.innerText = `BB`;
+        for (let i = 0; i < this.numPlayers; i++) if (i != sb && i != bb && i != this.dealer.curDealer) 
+            this.players[i].blindGUI.innerText = ``;
     }
 
     /* first round of betting, anyone can call, raise, fold */
@@ -207,13 +214,21 @@ class Game {
         this.players[ind].money += this.curPot;
         this.players[ind].moneyGUI.innerText = `$${this.players[ind].money}`;
 
-        this.curPot = 0;
-        potGUI.innerText = `Current Pot: $${this.curPot}`;
+        this.nextRound(msg);
+    }
 
-        this.dealer.dealPhase = 5;
-        prompt.nodeValue = msg;
-        accept.innerText = `Continue`;
-        document.body.appendChild(popUp);
+    splitWinner (indices) {
+        let msg = `Pot of $${this.curPot} split between `;
+        let share = this.curPot / indices.length;
+        for (let i of indices) {
+            this.players[i].money += share;
+            this.players[i].moneyGUI.innerText = `$${this.players[i].money}`;
+            msg += `${this.players[i].name}, `;
+        }
+        msg = msg.slice(0, -2);
+        let c = msg.lastIndexOf(',');
+        msg = msg.substring(0, c) + ' and' + msg.substring(c + 1);
+        this.nextRound(msg);
     }
 
     /* single winner because all others folded */
@@ -224,6 +239,11 @@ class Game {
         let msg = `Everyone folded! $${this.curPot} goes to ${this.players[ind].name}.`;
         this.players[ind].money += this.curPot;
         this.players[ind].moneyGUI.innerText = `$${this.players[ind].money}`;
+
+        this.nextRound(msg);
+    }
+
+    nextRound (msg) {
 
         this.curPot = 0;
         potGUI.innerText = `Current Pot: $${this.curPot}`;
