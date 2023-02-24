@@ -69,14 +69,14 @@ class Bot extends Player {
 
         if (!recall) {
 
-            if (bet > 5) this.raise(bet - 5);
+            if (bet > 4) this.raise(bet - 4);
             else if (bet > 2) this.check();
-            else this.fold();
+            else this.compFold();
 
         } else {
 
             if (bet > 3) this.check();
-            else this.fold();
+            else this.compFold();
         }
         
 
@@ -107,7 +107,7 @@ class Bot extends Player {
 
     /* raise by value + mincall */
     raise (value) {
-        let bet = (value * 10) + (poker.minCall - this.call);
+        let bet = (value * 5) + (poker.minCall - this.call);
         if (this.money >= bet) {
             this.call += bet;
             this.money -= bet;
@@ -115,16 +115,16 @@ class Bot extends Player {
         
             poker.curPot += bet;
             potGUI.innerText = `Current Pot: $${poker.curPot}`;
-            poker.minCall += value * 10;
-            callGUI.innerText = `Current minimum call: $${minCall}`;
+            poker.minCall += value * 5;
+            callGUI.innerText = `Current minimum call: $${poker.minCall}`;
             
-            updateHistory(`${this.name} raised by ${value * 10}`);
+            updateHistory(`${this.name} raised by $${value * 5}`);
 
         } else this.check();
     }
 
     /* fold if money is not zero */
-    fold () {
+    compFold () {
         if (this.money > 0) {
             this.fold = true;
             updateHistory(`${this.name} folded`);
@@ -133,8 +133,29 @@ class Bot extends Player {
 
     /* return evaluation of hand 1-10 */
     analyze () {
+        let r1 = this.getRank(this.card1);
+        let r2 = this.getRank(this.card2);
+        let mult = Math.floor(Math.random() * 2);
+        if (r1 == r2) r1 > 7 ? mult += 5 : mult += 3;
+        else {
+            r1 > 7 ? mult += 2 : mult += 1;
+            r2 > 7 ? mult += 2 : mult += 1;
+        }
 
-         
-        return 5;
+        if (this.getSuit(this.card1) == this.getSuit(this.card2)) mult += 2;
+
+        if (poker.dealer.dealPhase < 2) return mult;
+        
+        
+
+        return mult;
+    }
+
+    getSuit (card) {
+        return card.slice(1);
+    }
+
+    getRank (card) {
+        return toNum(card.slice(0,1));
     }
 }
