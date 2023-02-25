@@ -199,9 +199,6 @@ function showdown(playerArr, comCards) {
         scores.push(scoreHands(hands[h], h));
     }
     
-    for (let s of scores) console.log(`${poker.players[s[1]].name}: ${s[0][0]}, HC's: ${s[0][1]}, ${s[0][2]}`);
-    console.log(``);
-    
     let windex = [];
     let winscore = 10;
     for (let s of scores) {

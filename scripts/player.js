@@ -68,7 +68,7 @@ class Bot extends Player {
 
     /* take computer turn and reflect in GUI */
     botMove (recall) {
-        let bet = this.analyze();
+        let bet = this.analyze(poker.dealer.communityCards);
 
         if (!recall) {
 
@@ -135,7 +135,7 @@ class Bot extends Player {
     }
 
     /* return evaluation of hand 1-10 */
-    analyze () {
+    analyze (comCards) {
         let r1 = this.getRank(this.card1);
         let r2 = this.getRank(this.card2);
         let mult = Math.floor(Math.random() * 2);
@@ -144,12 +144,17 @@ class Bot extends Player {
             r1 > 7 ? mult += 2 : mult += 1;
             r2 > 7 ? mult += 2 : mult += 1;
         }
-
         if (this.getSuit(this.card1) == this.getSuit(this.card2)) mult += 2;
 
         if (poker.dealer.dealPhase < 2) return mult;
         
+        let r3 = getRank(comCards[0]);
+        if (r3 == r1 || r3 == r2) mult += 2;
+        if (r3 + 1 == r1 || r3 - 1 == r1 || r3 + 1 == r2 || r3 - 1 == r2) mult += 1;
 
+        if (poker.dealer.dealPhase < 3) return mult;
+
+        
 
         return mult;
     }
