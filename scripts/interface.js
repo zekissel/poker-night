@@ -34,6 +34,8 @@ const color_active = `#3775D3`;
 const color_inactive = `#252627`;
 const color_elim = `#A20021`;
 const color_grey = `#7E8893`;
+const color_felt = `#476947`;
+const color_grey2 = `#596069`;
 
 /* style for pop up window */
 const popUp = document.createElement('div');
@@ -88,6 +90,23 @@ function updateHistory (msg) {
 
     newItem.appendChild(document.createTextNode(msg));
     historyGUI.prepend(newItem);
+}
+
+function resetDealGUI () {
+    for (let g of comCardGUI) {
+        g.style.background = `none`;
+        g.style.backgroundColor = `${color_felt}`;
+        g.style.backgroundPosition = `center center`;
+        g.style.backgroundRepeat = `no-repeat`;
+        g.style.backgroundSize = `cover`;
+    }
+    for (let g of privCardGUI) {
+        g.style.background = `none`;
+        g.style.backgroundColor = `${color_grey2}`;
+        g.style.backgroundPosition = `center center`;
+        g.style.backgroundRepeat = `no-repeat`;
+        g.style.backgroundSize = `cover`;
+    }
 }
 
 

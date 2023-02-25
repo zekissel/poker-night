@@ -321,28 +321,28 @@ class Dealer {
         }
 
         /* update GUI */
-        privCardGUI[0].innerText = playersArr[0].card1;
-        privCardGUI[1].innerText = playersArr[0].card2;
+        privCardGUI[0].style.backgroundImage = `url(img/${playersArr[0].card1}.jpg)`;
+        privCardGUI[1].style.backgroundImage = `url(img/${playersArr[0].card2}.jpg)`;
         this.dealPhase++;
     }
 
     dealFlop () {
         for (let i = 0; i < 3; i++) {
             this.communityCards[i] = this.cardDeck[this.curCard++];
-            comCardGUI[i].innerText = this.communityCards[i];
+            comCardGUI[i].style.backgroundImage = `url(img/${this.communityCards[i]}.jpg)`;
         }
         this.dealPhase++;
     }
 
     dealTurn () {
         this.communityCards[3] = this.cardDeck[this.curCard++];
-        comCardGUI[3].innerText = this.communityCards[3];
+        comCardGUI[3].style.backgroundImage = `url(img/${this.communityCards[3]}.jpg)`;
         this.dealPhase++;
     }
     
     dealRiver () {
         this.communityCards[4] = this.cardDeck[this.curCard++];
-        comCardGUI[4].innerText = this.communityCards[4];
+        comCardGUI[4].style.backgroundImage = `url(img/${this.communityCards[4]}.jpg)`;
         this.dealPhase++;
     }
 
@@ -363,8 +363,7 @@ class Dealer {
         }
         
         for (let c of this.communityCards) c = '';
-        for (let g of comCardGUI) g.innerText = '';
-        for (let g of privCardGUI) g.innerText = '';
+        resetDealGUI();
         this.dealPhase = 0;
         historyGUI.innerText = '';
     }
