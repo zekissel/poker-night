@@ -88,13 +88,22 @@ class Bot extends Player {
                     if (bet > 2) this.check();
                     else this.compFold();
                 }
-            } else {
+            } else if (portion >= 10) {
                 if (!recall) {
                     if (bet > 4) this.raise(bet - 4);
-                    else if (bet > 2) this.check();
+                    else if (bet > 1) this.check();
                     else this.compFold();
                 } else {
                     if (bet > 2) this.check();
+                    else this.compFold();
+                }
+            }else {
+                if (!recall) {
+                    if (bet > 4) this.raise(bet - 4);
+                    else if (bet > 1) this.check();
+                    else this.compFold();
+                } else {
+                    if (bet > 1) this.check();
                     else this.compFold();
                 }
             }
