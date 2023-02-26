@@ -264,7 +264,7 @@ class Game {
     /* return number of players not folded */
     getRemPlayers () {
         let ret = 0;
-        for (let p in this.players) if (!p.fold) ret++;
+        for (let p of this.players) if (!p.fold) ret++;
         return ret;
     }
 

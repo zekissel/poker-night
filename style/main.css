@@ -72,7 +72,7 @@ h1 {
     padding: .5%;
     margin: 1%;
     height: 20vh;
-    background-position: center center;
+    background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -84,7 +84,7 @@ h1 {
     padding: 1%;
     margin: 2%;
     height: 20vh;
-    background-position: center center;
+    background-position: top left;
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -150,21 +150,36 @@ h1 {
 }
 
 .names {
-    width: 33%;
+    width: 25%;
     margin: 3%;
     padding: 1%;
-    float: left;;
+    float: left;
 }
 
-.moneyCount {
-    width: 33%;
-    margin: 3%;
-    padding: 1%;
-    margin-top: 10%;
-    font-size: 125%;
-    background-color: var(--fg2);
-    position:relative;
-    top: 15px;
+@media (min-width: 960px) {
+    .moneyCount {
+        width: 33%;
+        margin: 3%;
+        padding: 1%;
+        margin-top: 10%;
+        font-size: 125%;
+        background-color: var(--fg2);
+        position:relative;
+        top: 10px;
+    }
+}
+
+@media (max-width: 960px) {
+    .moneyCount {
+        width: 10%;
+        margin: 1%;
+        padding: 1%;
+        margin-top: 10%;
+        font-size: 100%;
+        background-color: var(--fg2);
+        position:relative;
+        top: 5px;
+    }
 }
 
 .blind {

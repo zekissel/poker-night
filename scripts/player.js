@@ -68,20 +68,37 @@ class Bot extends Player {
 
     /* take computer turn and reflect in GUI */
     botMove (recall) {
-        let bet = this.analyze(poker.dealer.communityCards);
-
-        if (!recall) {
-
-            if (bet > 4) this.raise(bet - 4);
-            else if (bet > 2) this.check();
-            else this.compFold();
-
-        } else {
-
-            if (bet > 3) this.check();
-            else this.compFold();
+        if (this.money == 0) this.check();
+        else {
+            let bet = this.analyze(poker.dealer.communityCards);
+            let portion = (poker.minCall / this.money) * 100;
+            if (portion >= 80) {
+                if (this.money < 50 && bet > 4) this.check();
+                if (bet > 6) this.check();
+                else this.compFold();
+            } else if (portion >= 50) {
+                if (bet > 4) this.check();
+                else this.compFold();
+            } else if (portion >= 25) {
+                if (!recall) {
+                    if (bet > 4) this.raise(bet - 4);
+                    else if (bet > 2) this.check();
+                    else this.compFold();
+                } else {
+                    if (bet > 2) this.check();
+                    else this.compFold();
+                }
+            } else {
+                if (!recall) {
+                    if (bet > 4) this.raise(bet - 4);
+                    else if (bet > 2) this.check();
+                    else this.compFold();
+                } else {
+                    if (bet > 2) this.check();
+                    else this.compFold();
+                }
+            }
         }
-        
 
         if (!this.fold) this.nameGUI.style.backgroundColor = `${color_inactive}`;
         else this.nameGUI.style.backgroundColor = `${color_elim}`;
@@ -128,7 +145,7 @@ class Bot extends Player {
 
     /* fold if money is not zero */
     compFold () {
-        if (this.money > 0) {
+        if (this.money > 0 && poker.minCall > 0) {
             this.fold = true;
             updateHistory(`${this.name} folded`);
         } else this.check();
@@ -147,14 +164,19 @@ class Bot extends Player {
         if (this.getSuit(this.card1) == this.getSuit(this.card2)) mult += 2;
 
         if (poker.dealer.dealPhase < 2) return mult;
-        
         let r3 = getRank(comCards[0]);
+        let r4 = getRank(comCards[1]);
+        let r5 = getRank(comCards[2]);
         if (r3 == r1 || r3 == r2) mult += 2;
         if (r3 + 1 == r1 || r3 - 1 == r1 || r3 + 1 == r2 || r3 - 1 == r2) mult += 1;
 
         if (poker.dealer.dealPhase < 3) return mult;
+        let r6 = getRank(comCards[3]);
 
-        
+
+        if (poker.dealer.dealPhase < 4) return mult;
+        let r7 = getRank(comCards[4]);
+
 
         return mult;
     }

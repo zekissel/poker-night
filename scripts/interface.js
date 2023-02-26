@@ -96,14 +96,14 @@ function resetDealGUI () {
     for (let g of comCardGUI) {
         g.style.background = `none`;
         g.style.backgroundColor = `${color_felt}`;
-        g.style.backgroundPosition = `center center`;
+        g.style.backgroundPosition = `top left`;
         g.style.backgroundRepeat = `no-repeat`;
         g.style.backgroundSize = `cover`;
     }
     for (let g of privCardGUI) {
         g.style.background = `none`;
         g.style.backgroundColor = `${color_grey2}`;
-        g.style.backgroundPosition = `center center`;
+        g.style.backgroundPosition = `top left`;
         g.style.backgroundRepeat = `no-repeat`;
         g.style.backgroundSize = `cover`;
     }
