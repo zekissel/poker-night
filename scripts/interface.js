@@ -201,7 +201,6 @@ skipButton.addEventListener('click', (e) => {
 function showdown(playerArr, comCards) {
 
     let hands = [];
-
     for (let n = 0; n < playerArr.length; n++) {
         if (playerArr[n].fold) hands.push([false]);
         else {
@@ -217,6 +216,10 @@ function showdown(playerArr, comCards) {
     for (let h = 0; h < hands.length; h++) if (hands[h][0] !== false) {
         scores.push(scoreHands(hands[h], h));
     }
+    for (let s of scores) {
+        let p = playerArr[s[1]];
+        console.log(`${p.name}: ${s[0]}; index: ${s[1]}`);
+    } console.log(``);
     
     let windex = [];
     let winscore = 10;
@@ -229,12 +232,11 @@ function showdown(playerArr, comCards) {
     }
     if (windex.length == 1) return windex[0];
 
-    /* settle tie by first high card */
-    windex = settleTie(winscore, scores, 1);
-    if (windex.length == 1) return windex[0];
-
-    windex = settleTie(winscore, scores, 2);
-    if (windex.length == 1) return windex[0];
+    /* settle tie by high cards */
+    for (let x = 1; x < 3; x++) {
+        windex = settleTie(winscore, scores, x);
+        if (windex.length == 1) return windex[0];
+    }
 
     if (winscore == 6 || winscore == 7 || winscore == 8) windex = settleTie(winscore, scores, 3);
     if (windex.length == 1) return windex[0];
@@ -275,7 +277,7 @@ function scoreHands (hand, index) {
 
     let flush = false;
     for (let s in suits) {
-        if (suits[s] == 5) {
+        if (suits[s] >= 5) {
             flush = true;
             for (let c in hand) {
                 /* make sure 6th and 7th cards cannot contribute to straight or high cards */
@@ -304,7 +306,7 @@ function scoreHands (hand, index) {
     let straight = testStraight(ranks);
 
     /* return straights, flushes, and straight flushes */
-    if (straight !== false) {
+    if (straight != false) {
         if (flush) straight[0] = 1;
         return [straight, index];
     }
@@ -324,7 +326,7 @@ function scoreHands (hand, index) {
 
 function testStraight (ranks) {
     let run = 0;
-    for (let i = 15; i > 0; i--) {
+    for (let i = 14; i > 0; i--) {
         let c;
         if (i == 1 || i == 10 || i == 11 || i == 12 || i == 13 || i == 14) {
             switch (i) {
@@ -334,10 +336,11 @@ function testStraight (ranks) {
                 case 13: c = 'K'; break;
                 default: c = 'A';
             }
-        } else c == i;
+        } else c = i;
 
         run = ranks[c] > 0 ? run + 1 : 0;
-        if (run == 5) return [5, c + 4, 0];
+        if (run == 5 && i != 1) return [5, toNum(c) + 4, 0];
+        else if (run == 5) return [5, 5, 0];
     }
     return false;
 }
