@@ -1,4 +1,4 @@
-const names = [ 'Jaya', 'Ana', 'Bob', 'Cree', 'Dan', 'Etho' ];
+const names = [ 'Player', 'Ana', 'Bob', 'Cree', 'Dan', 'Etho' ];
 const startMoney = 1000;
 
 class Game {
