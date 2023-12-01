@@ -1,5 +1,5 @@
 import './App.css'
-import { Player, Blinds } from './typedef'
+import { Card, Player, Blinds } from './typedef'
 import Actions from './components/Actions'
 import Players from './components/Players'
 import History from './components/History'
@@ -10,10 +10,10 @@ import gameManager from './game'
 
 
 const p_temp: Player[] = [
-  {id: 1, name: 'Alice', money: 1000, call: 0, fold: false, blind: Blinds.Small, card1: undefined, card2: undefined},
-  {id: 2, name: 'Bob', money: 1000, call: 0, fold: false, blind: Blinds.Big, card1: undefined, card2: undefined},
-  {id: 3, name: 'Chad', money: 1000, call: 0, fold: false, blind: Blinds.None, card1: undefined, card2: undefined},
-  {id: 4, name: 'Dan', money: 1000, call: 0, fold: false, blind: Blinds.None, card1: undefined, card2: undefined},
+  {id: 1, name: 'Andy', money: 1000, call: 0, fold: false, blind: Blinds.Small, card1: undefined, card2: undefined},
+  {id: 2, name: 'Bing', money: 1000, call: 0, fold: false, blind: Blinds.Big, card1: undefined, card2: undefined},
+  {id: 3, name: 'Cree', money: 1000, call: 0, fold: false, blind: Blinds.None, card1: undefined, card2: undefined},
+  {id: 4, name: 'Dean', money: 1000, call: 0, fold: false, blind: Blinds.None, card1: undefined, card2: undefined},
   {id: 5, name: 'Etho', money: 1000, call: 0, fold: false, blind: Blinds.None, card1: undefined, card2: undefined},
 ];
 
@@ -31,12 +31,14 @@ function App() {
       p_temp.unshift({ id: 0, name: `${name}`, money: 1000, call: 0, fold: false, blind: Blinds.Dealer, card1: undefined, card2: undefined });
       setPlayers(p_temp);
       setInit(false);
-      gameManager(log, setLog, players, setPlayers, pot, setPot, min, setMin);
+      gameManager(log, setLog, players, setPlayers, pot, setPot, min, setMin, community, setCommunity);
     }
   }
 
+  const [community, setCommunity] = useState<Card[]>([]);
   const [pot, setPot] = useState(0);
   const [min, setMin] = useState(0);
+  const [turn, setTurn] = useState(1);
 
   const [log, setLog] = useState<string[]>([]);
 
@@ -51,7 +53,7 @@ function App() {
             <Players players={players}/>
             <Hand info={players}/>
           </span>
-          <Table pot={pot} min={min} />
+          <Table pot={pot} min={min} info={players} community={community} />
           <span id='right-panel'>
             <Actions minBet={min} info={players} />
             <History log={log}/>

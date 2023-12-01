@@ -116,6 +116,12 @@
   background-color: #666;
 }
 
+#pBlind {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+}
+
 #actions {
   min-width: 21vw;
   height: 25vh;

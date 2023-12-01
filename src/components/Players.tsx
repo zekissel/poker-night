@@ -9,13 +9,16 @@ interface PlayersProps {
 
 function Player({ info }: PlayerProps) {
 
+    const chip = { backgroundColor: `#222` }
     return (
         <div className='player'>
             <span id='pName'>
                 { info.name }
             </span>
-            <span id='pBlind'>
-                { info.blind }
+            <span id='pBlind' style={info.blind > 0 ? chip : undefined}>
+                { info.blind === 1 && 'D' }
+                { info.blind === 2 && 'SB' }
+                { info.blind === 3 && 'BB' }
             </span>
             <span id='pMoney'>
                 ${ info.money }

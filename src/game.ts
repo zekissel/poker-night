@@ -30,14 +30,14 @@ function gameManager (
     setPot: React.Dispatch<React.SetStateAction<number>>,
     min: number,
     setMin: React.Dispatch<React.SetStateAction<number>>,
+    community: Card[],
+    setCommunity: React.Dispatch<React.SetStateAction<Card[]>>,
 
 ) {
 
-    let curCard = 0;
     const deck: Card[] = initDeck();
+    let curCard = 0;
     shuffleDeck(deck);
-
-    const communityCards: Card[] = [];
 
     let active = true;
     let dealer = 0;
