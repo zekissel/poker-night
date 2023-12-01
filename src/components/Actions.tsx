@@ -4,7 +4,7 @@ function Actions() {
         <div id='actions'>
             <h2>Actions</h2>
             <menu>
-                <li><button>Submit</button><span>$</span></li>
+                <li><button id='submit'>Submit</button>$<span id='curCall'>0</span></li>
                 <li><input type='range'/></li>
                 <li><button>Fold</button></li>
                 <li><button>Skip</button></li>

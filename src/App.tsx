@@ -1,18 +1,19 @@
-import './App.css'
+import 'App.css'
 import { Player, Blinds } from './typedef'
-import Actions from './Actions'
-import Players from './Players'
-import History from './History'
-import Table from './Table'
+import Actions from './components/Actions'
+import Players from './components/Players'
+import History from './components/History'
+import Table from './components/Table'
 import React, { useState } from 'react';
+import Hand from './components/Hand'
 
 
 const p_temp: Player[] = [
-  {name: 'Alice', money: 1000, call: 0, fold: false, blind: Blinds.Small},
-  {name: 'Bob', money: 1000, call: 0, fold: false, blind: Blinds.None},
-  {name: 'Chad', money: 1000, call: 0, fold: false, blind: Blinds.None},
-  {name: 'Dan', money: 1000, call: 0, fold: false, blind: Blinds.None},
-  {name: 'Etho', money: 1000, call: 0, fold: false, blind: Blinds.None},
+  {id: 1, name: 'Alice', money: 1000, call: 0, fold: false, blind: Blinds.Small},
+  {id: 2, name: 'Bob', money: 1000, call: 0, fold: false, blind: Blinds.None},
+  {id: 3, name: 'Chad', money: 1000, call: 0, fold: false, blind: Blinds.None},
+  {id: 4, name: 'Dan', money: 1000, call: 0, fold: false, blind: Blinds.None},
+  {id: 5, name: 'Etho', money: 1000, call: 0, fold: false, blind: Blinds.None},
 ];
 
 
@@ -26,11 +27,13 @@ function App() {
   const [init, setInit] = useState(true);
   const enterSubmit = (e: React.KeyboardEvent) => { 
     if (e.key == 'Enter' && name !== '') {
-      p_temp.unshift({ name: `${name}`, money: 1000, call: 0, fold: false, blind: Blinds.Big });
+      p_temp.unshift({ id: 0, name: `${name}`, money: 1000, call: 0, fold: false, blind: Blinds.Big });
       setPlayers(p_temp);
       setInit(false);
     }
   }
+
+  const [log, setLog] = useState<string[]>([]);
 
   return (
     <main>
@@ -39,12 +42,15 @@ function App() {
         <input type='text' placeholder='Nickname' onKeyDown={enterSubmit} onChange={updateName}></input>
       :
         <span id='game'>
-          <span id='left'>
+          <span id='left-panel'>
             <Players players={players}/>
-            <History />
+            <Hand info={players[0]}/>
           </span>
           <Table />
-          <Actions />
+          <span id='right-panel'>
+            <Actions />
+            <History log={log}/>
+          </span>
         </span>
       }
     </main>

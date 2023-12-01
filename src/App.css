@@ -44,21 +44,60 @@
   background-color: #274F32;
 }
 
-#myHand #myCards {
+#myCards {
   display: flex;
   justify-content: center;
 }
 
-.mycard {
-  min-width: 5rem;
-  min-height: 4rem;
+#hand {
+  min-width: 16vw;
+  height: 25vh;
+  border-radius: 5%;
 
-  background-color: #274F32;
+  background-color: #333;
+}
+
+#myChips {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#myMoney, #myBlind {
+  width: 10rem;
+  height: 3rem;
+  margin: 2%;
+  padding: 8% 0 0 0;
+  font-size: large;
+  font-weight: 500;
+
+  background-color: #242424;
+}
+
+#history {
+  width: 21vw;
+  height: 30vh;
+  border-radius: 5%;
+  margin: 4% 0;
+
+  
+  justify-content: center;
+
+  background-color: #333;
+}
+
+#log {
+  width: 90%;
+  height: 80%;
+  border-radius: 5%;
+  list-style-type: none;
+
 }
 
 #players {
   min-width: 16vw;
-  min-height: 35vh;
+  min-height: 30vh;
   border-radius: 5%;
 
   background-color: #333;
@@ -66,7 +105,7 @@
 
 .player {
   background-color: #444;
-  margin: 4% 2%;
+  margin: 6% 2%;
   display: flex;
   justify-content: space-between;
 }
@@ -80,7 +119,7 @@
 
 #actions {
   min-width: 21vw;
-  height: 35vh;
+  height: 25vh;
   border-radius: 5%;
 
   background-color: #333;
@@ -95,11 +134,22 @@ menu {
 li {
   background-color: #444;
   margin: 4% 2%;
-
+  width: 84%;
+  display: flex;
+  justify-content: space-around;
 }
 
 button {
   width: 90%;
   font-size: large;
   background-color: #333;
+  border-radius: 15%;
+}
+
+#submit {
+  max-width: 60%;
+}
+
+input {
+  min-width: 100%;
 }

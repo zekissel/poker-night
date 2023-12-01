@@ -1,4 +1,4 @@
-import { Player } from "./typedef";
+import { Player } from "../typedef";
 
 interface PlayerProps {
     info: Player;
@@ -30,7 +30,7 @@ function Players({ players }: PlayersProps) {
     return (
         <div id='players'>
             <h2>Players</h2>
-            { players.map((p) => <Player key={p.name} info={p} />) }
+            { players.map((p) => p.id !== 0 && <Player key={p.name} info={p} />) }
         </div>
     )
 }

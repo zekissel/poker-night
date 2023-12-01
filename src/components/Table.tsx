@@ -21,10 +21,6 @@ function Table() {
                     <div id='mc1' className='card'></div>
                     <div id='mc2' className='card'></div>
                 </div>
-                <div id='myChips'>
-                    <div id="myMoney"></div>
-                    <div id="myBlind"></div>
-                </div>
             </div>
         </div>
     )
