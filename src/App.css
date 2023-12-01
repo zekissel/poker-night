@@ -4,3 +4,102 @@
   padding: 2rem;
   text-align: center;
 }
+
+#game {
+  display: flex;
+}
+
+#pokerTable {
+  min-width: 42vw;
+  min-height: 48vh;
+  padding: 1%;
+  margin: 2%;
+
+  background-color: #2D5B39;
+  border: 2px solid #7D8980;
+  border-radius: 5%;
+}
+
+#communityPot {
+  min-height: 20%;
+  padding: 2% 1% 0% 1%;
+}
+
+#jackpot {
+  font-size: larger;
+  font-weight: 600;
+}
+
+#communityCards {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  min-width: 5rem;
+  min-height: 8rem;
+  margin: 1%;
+  padding: 2%;
+
+  background-color: #274F32;
+}
+
+#myHand #myCards {
+  display: flex;
+  justify-content: center;
+}
+
+.mycard {
+  min-width: 5rem;
+  min-height: 4rem;
+
+  background-color: #274F32;
+}
+
+#players {
+  min-width: 16vw;
+  min-height: 35vh;
+  border-radius: 5%;
+
+  background-color: #333;
+}
+
+.player {
+  background-color: #444;
+  margin: 4% 2%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#pName, #pMoney {
+  min-width: 5rem;
+  font-size: large;
+
+  background-color: #666;
+}
+
+#actions {
+  min-width: 21vw;
+  height: 35vh;
+  border-radius: 5%;
+
+  background-color: #333;
+}
+
+menu {
+  min-width: 60%;
+
+  list-style-type: none;
+}
+
+li {
+  background-color: #444;
+  margin: 4% 2%;
+
+}
+
+button {
+  width: 90%;
+  font-size: large;
+  background-color: #333;
+}
