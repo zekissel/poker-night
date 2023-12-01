@@ -1,10 +1,15 @@
-function Table() {
+interface TableProps {
+    pot: number;
+    min: number;
+}
+
+function Table({ pot, min }: TableProps) {
 
     return (
         <div id='pokerTable'>
             <div id='communityPot'>
-                <div id="jackpot">Current Pot: $<span id="curpot">0</span></div>
-                <div id="minimum">Minimum call: $<span id="mincal">0</span></div>
+                <div id="jackpot">Current Pot: $<span id="curpot">{ pot }</span></div>
+                <div id="minimum">Minimum call: $<span id="mincal">{ min }</span></div>
             </div>
             <div id='communityCards'>
                 <div id="cc1" className='card'> </div>

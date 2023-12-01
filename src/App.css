@@ -76,12 +76,11 @@
 }
 
 #history {
-  width: 21vw;
+  min-width: 21vw;
   height: 30vh;
   border-radius: 5%;
   margin: 4% 0;
 
-  
   justify-content: center;
 
   background-color: #333;
@@ -150,6 +149,12 @@ button {
   max-width: 60%;
 }
 
-input {
+#slider {
   min-width: 100%;
+}
+
+#curCall {
+  max-width: 20%;
+  font-size: large;
+  font-weight: 500;
 }
